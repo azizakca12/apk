@@ -8,6 +8,7 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
 	<div class="content-card empty-state">
 		<h1><?php esc_html_e( 'That page has moved.', 'calmpress' ); ?></h1>
 		<p><?php esc_html_e( 'Try a search or return to the homepage.', 'calmpress' ); ?></p>

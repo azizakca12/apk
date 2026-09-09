@@ -8,6 +8,7 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
 	<?php while ( have_posts() ) : the_post(); ?>
 		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 			<header class="single-header">
@@ -27,6 +28,7 @@ get_header();
 		</article>
 		<?php if ( comments_open() || get_comments_number() ) : comments_template(); endif; ?>
 	<?php endwhile; ?>
+	<?php get_sidebar(); ?>
 </main>
 <?php
 get_footer();

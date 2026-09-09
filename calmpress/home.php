@@ -8,6 +8,7 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
 	<header class="archive-header">
 		<h1><?php single_post_title(); ?></h1>
 		<?php if ( get_bloginfo( 'description' ) ) : ?>
@@ -24,6 +25,7 @@ get_header();
 	<?php else : ?>
 		<?php get_template_part( 'template-parts/content', 'none' ); ?>
 	<?php endif; ?>
+	<?php get_sidebar(); ?>
 </main>
 <?php
 get_footer();

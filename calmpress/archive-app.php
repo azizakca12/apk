@@ -8,6 +8,7 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
 	<header class="archive-header">
 		<h1><?php post_type_archive_title(); ?></h1>
 		<p><?php esc_html_e( 'Discover useful Android applications with clear details and direct downloads.', 'calmpress' ); ?></p>
@@ -22,6 +23,7 @@ get_header();
 	<?php else : ?>
 		<?php get_template_part( 'template-parts/content', 'none' ); ?>
 	<?php endif; ?>
+	<?php get_sidebar(); ?>
 </main>
 <?php
 get_footer();

@@ -8,6 +8,8 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_widget_area( 'home-before' ); ?>
 	<section class="hero" aria-labelledby="hero-title">
 		<p class="badge"><?php esc_html_e( 'Thoughtful publishing & app discovery', 'calmpress' ); ?></p>
 		<h1 id="hero-title"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></h1>
@@ -61,6 +63,7 @@ get_header();
 			</div>
 		</section>
 	<?php endif; wp_reset_postdata(); ?>
+	<?php calmpress_render_widget_area( 'home-after' ); ?>
 </main>
 <?php
 get_footer();

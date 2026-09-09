@@ -15,6 +15,15 @@
 <?php wp_body_open(); ?>
 <a class="screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'calmpress' ); ?></a>
 <header class="site-header">
+	<?php if ( calmpress_get_option( 'calmpress_announcement_text' ) ) : ?>
+		<div class="site-announcement">
+			<?php if ( calmpress_get_option( 'calmpress_announcement_link' ) ) : ?>
+				<a href="<?php echo esc_url( calmpress_get_option( 'calmpress_announcement_link' ) ); ?>"><?php echo esc_html( calmpress_get_option( 'calmpress_announcement_text' ) ); ?></a>
+			<?php else : ?>
+				<?php echo esc_html( calmpress_get_option( 'calmpress_announcement_text' ) ); ?>
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
 	<div class="site-header__inner">
 		<div class="site-branding">
 			<?php if ( has_custom_logo() ) : ?>
@@ -40,4 +49,6 @@
 			<span class="theme-toggle__label"><?php esc_html_e( 'Theme', 'calmpress' ); ?></span>
 		</button>
 	</div>
+	<?php calmpress_render_widget_area( 'header' ); ?>
 </header>
+<?php calmpress_render_ad( 'header' ); ?>

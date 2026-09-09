@@ -8,6 +8,7 @@
 get_header();
 ?>
 <main id="primary" class="site-main">
+	<?php calmpress_render_before_content(); ?>
 	<?php if ( have_posts() ) : ?>
 		<div class="card-grid">
 			<?php while ( have_posts() ) : the_post(); ?>
@@ -18,6 +19,7 @@ get_header();
 	<?php else : ?>
 		<?php get_template_part( 'template-parts/content', 'none' ); ?>
 	<?php endif; ?>
+	<?php get_sidebar(); ?>
 </main>
 <?php
 get_footer();

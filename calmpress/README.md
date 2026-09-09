@@ -44,3 +44,28 @@ for `/apps/`, visit **Settings → Permalinks** and press **Save Changes**.
 
 Use the Site Identity, Menus, Reading, and Widgets screens to customize the
 theme. Child themes can override any template or enqueue additional styles.
+
+### CalmPress Settings panel
+
+After activation, open **Appearance → CalmPress Settings**. The panel uses the
+WordPress Settings API and is available to administrators with the
+`manage_options` capability. It includes design controls (accent color,
+container width, and cards per row), announcement/header and footer controls,
+SEO/schema defaults, emoji performance settings, social profile links, and
+five advertising placements. Ad fields accept safe HTML through
+`wp_kses_post`; script tags, event handlers, and unsafe attributes are removed
+automatically. Ads are disabled until each placement is explicitly enabled.
+
+The Widgets screen includes Header, After content, Sidebar, Home before
+content, Home after content, and Footer areas. The bundled **CalmPress: Recent
+Apps** widget lists the latest `app` entries.
+
+### Türkçe kullanım ve çeviri
+
+WordPress’in **Ayarlar → Genel → Site Dili** bölümünden **Türkçe** seçildiğinde
+tema `languages/calmpress-tr_TR.po` çeviri kataloğunu kullanır. WordPress.org
+dil paketleri veya Loco Translate gibi bir araç `.mo` dosyasını oluşturup
+yükleyebilir; temanın `.po` dosyası kaynak çevirileri ve yeni yönetim paneli
+ifadelerini içerir. Yönetim panelini **Görünüm → CalmPress Settings** üzerinden
+yapılandırın. Reklam kodu eklerken yalnızca güvenli HTML kullanın; JavaScript
+etiketleri bilerek kaldırılır.
