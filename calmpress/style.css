@@ -92,6 +92,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 a { color: var(--cp-accent); text-underline-offset: .18em; }
 a:hover { color: var(--cp-accent-hover); }
+a:not(.button):not(.post-card__link):not(.site-branding__link):not(.logo-link) { text-decoration-thickness: .08em; }
 
 button,
 input,
@@ -202,9 +203,18 @@ button:active,
 	list-style: none;
 }
 
-.primary-navigation a { color: var(--cp-text-muted); font-size: .95rem; font-weight: 600; text-decoration: none; }
+.primary-navigation a { position: relative; color: var(--cp-text-muted); font-size: .95rem; font-weight: 600; text-decoration: none; }
 .primary-navigation a:hover,
-.primary-navigation .current-menu-item > a { color: var(--cp-text); }
+.primary-navigation .current-menu-item > a,
+.primary-navigation .current-menu-ancestor > a { color: var(--cp-text); }
+.primary-navigation--minimal a::after,
+.primary-navigation--underline a::after { position: absolute; right: 0; bottom: -.55rem; left: 0; height: 2px; background: var(--cp-accent); content: ""; transform: scaleX(0); transform-origin: center; transition: transform .18s ease; }
+.primary-navigation--minimal a:hover::after,
+.primary-navigation--minimal .current-menu-item > a::after,
+.primary-navigation--minimal .current-menu-ancestor > a::after,
+.primary-navigation--underline a:hover::after,
+.primary-navigation--underline .current-menu-item > a::after,
+.primary-navigation--underline .current-menu-ancestor > a::after { transform: scaleX(1); }
 .primary-navigation--pill a { padding: .35rem .7rem; border-radius: 999px; }
 .primary-navigation--pill .current-menu-item > a,
 .primary-navigation--pill a:hover { background: var(--cp-surface-muted); }
@@ -239,6 +249,15 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
 .section-heading h2 { margin: 0; }
 .section-heading p { margin: 0; color: var(--cp-text-muted); }
+.section-link,
+.card-link { display: inline-flex; align-items: center; gap: .45rem; color: var(--cp-accent); font-size: .9rem; font-weight: 700; text-decoration: none; }
+.section-link span,
+.card-link span,
+.link-arrow { display: inline-block; transition: transform .18s ease; }
+.section-link:hover span,
+.card-link:hover span,
+.post-card__link:hover .card-link span,
+.entry-title a:hover .link-arrow { transform: translate(.2rem, -.1rem); }
 .section-spaced { margin-top: clamp(3rem, 7vw, 6rem); }
 .section-spaced--compact { margin-top: clamp(2rem, 4vw, 3rem); }
 .section-spaced--spacious { margin-top: clamp(4rem, 9vw, 8rem); }
@@ -262,8 +281,10 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .app-card .entry-title { font-size: 1.35rem; }
 .post-card p,
 .app-card p { margin: .7rem 0 0; color: var(--cp-text-muted); }
-.post-card__link { display: block; color: inherit; text-decoration: none; }
+.post-card__link { display: block; height: 100%; color: inherit; text-decoration: none; }
 .post-card__link:hover .entry-title { color: var(--cp-accent); }
+.post-card__link:focus-visible { outline-offset: -3px; }
+.card-link { margin-top: 1rem; }
 
 .app-card__icon { aspect-ratio: 1; width: 4rem; margin-bottom: 1rem; border-radius: 1rem; object-fit: cover; }
 .app-card__facts { display: flex; flex-wrap: wrap; gap: .4rem .8rem; margin: 1rem 0; color: var(--cp-text-muted); font-size: .86rem; }
@@ -291,7 +312,10 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .single-header .entry-title { font-size: clamp(2.2rem, 5vw, 4rem); }
 .featured-image { margin: 1.5rem auto 2rem; border-radius: var(--cp-radius); }
 .post-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--cp-border); }
-.post-navigation a { color: var(--cp-text); font-weight: 650; text-decoration: none; }
+.post-navigation a { display: inline-flex; color: var(--cp-text); font-weight: 650; text-decoration: none; }
+.post-navigation a:hover { color: var(--cp-accent); }
+.post-navigation__label { color: var(--cp-text-muted); font-size: .78rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.post-navigation__label a { display: block; margin-top: .35rem; color: var(--cp-text); font-size: 1rem; letter-spacing: 0; text-transform: none; }
 .post-navigation .nav-next { text-align: right; }
 
 .app-hero { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(15rem, .8fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: center; margin-bottom: 2rem; }
@@ -304,7 +328,8 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 
 .pagination { display: flex; justify-content: center; margin-top: 2rem; }
 .page-numbers { display: flex; gap: .4rem; align-items: center; padding: 0; list-style: none; }
-.page-numbers a, .page-numbers span { display: grid; min-width: 2.5rem; min-height: 2.5rem; place-items: center; padding: .4rem; border: 1px solid var(--cp-border); border-radius: .6rem; color: var(--cp-text); text-decoration: none; }
+.page-numbers a, .page-numbers span { display: grid; min-width: 2.5rem; min-height: 2.5rem; place-items: center; padding: .4rem; border: 1px solid var(--cp-border); border-radius: .6rem; color: var(--cp-text); text-decoration: none; transition: border-color .18s ease, background-color .18s ease, transform .18s ease; }
+.page-numbers a:hover { border-color: var(--cp-accent); background: var(--cp-surface-muted); transform: translateY(-2px); }
 .page-numbers .current { background: var(--cp-accent); border-color: var(--cp-accent); color: var(--cp-accent-contrast); }
 
 .search-form { display: flex; gap: .5rem; max-width: 36rem; }
@@ -344,6 +369,8 @@ input[type="search"], input[type="text"], input[type="url"], input[type="email"]
 .social-navigation a { color: inherit; }
 .footer-navigation ul { display: flex; flex-wrap: wrap; gap: 1rem; margin: 0; padding: 0; list-style: none; }
 .footer-navigation a { color: inherit; }
+.footer-navigation a:hover,
+.social-navigation a:hover { color: var(--cp-accent); }
 .site-footer--columns-1 .site-footer__inner { display: block; }
 .site-footer--columns-3 .site-footer__inner,
 .site-footer--columns-4 .site-footer__inner { display: grid; grid-template-columns: minmax(0, 1fr) repeat(2, minmax(0, auto)); }

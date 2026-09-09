@@ -30,8 +30,8 @@ get_header();
 				<?php endif; ?>
 			</div>
 			<nav class="post-navigation" aria-label="<?php esc_attr_e( 'Yazı gezinmesi', 'calmpress' ); ?>">
-				<div class="nav-previous"><?php previous_post_link( '%link', '← %title' ); ?></div>
-				<div class="nav-next"><?php next_post_link( '%link', '%title →' ); ?></div>
+				<div class="nav-previous"><?php previous_post_link( '<span class="post-navigation__label">%link</span>', '← Önceki yazı: %title' ); ?></div>
+				<div class="nav-next"><?php next_post_link( '<span class="post-navigation__label">%link</span>', 'Sonraki yazı: %title →' ); ?></div>
 			</nav>
 		</article>
 		<?php if ( comments_open() || get_comments_number() ) : comments_template(); endif; ?>

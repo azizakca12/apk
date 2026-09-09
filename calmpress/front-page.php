@@ -38,7 +38,7 @@ get_header();
 			<div class="section-heading">
 				<h2 id="latest-title"><?php esc_html_e( 'Günlükten son yazılar', 'calmpress' ); ?></h2>
 				<?php $blog_url = get_option( 'page_for_posts' ) ? get_permalink( (int) get_option( 'page_for_posts' ) ) : home_url( '/' ); ?>
-				<a href="<?php echo esc_url( $blog_url ); ?>"><?php esc_html_e( 'Tümünü gör', 'calmpress' ); ?></a>
+				<a class="section-link" href="<?php echo esc_url( $blog_url ); ?>"><?php esc_html_e( 'Tüm yazıları gör', 'calmpress' ); ?><span aria-hidden="true">→</span></a>
 			</div>
 			<div class="card-grid">
 				<?php while ( $latest_posts->have_posts() ) : $latest_posts->the_post(); ?>
@@ -61,7 +61,7 @@ get_header();
 		<section class="section-spaced section-spaced--<?php echo esc_attr( calmpress_get_option( 'calmpress_section_spacing' ) ); ?>" aria-labelledby="apps-title">
 			<div class="section-heading">
 				<h2 id="apps-title"><?php esc_html_e( 'Öne çıkan uygulamalar', 'calmpress' ); ?></h2>
-				<a href="<?php echo esc_url( get_post_type_archive_link( 'app' ) ); ?>"><?php esc_html_e( 'Uygulamalara göz at', 'calmpress' ); ?></a>
+				<a class="section-link" href="<?php echo esc_url( get_post_type_archive_link( 'app' ) ); ?>"><?php esc_html_e( 'Tüm uygulamaları gör', 'calmpress' ); ?><span aria-hidden="true">→</span></a>
 			</div>
 			<div class="card-grid">
 				<?php while ( $latest_apps->have_posts() ) : $latest_apps->the_post(); ?>
