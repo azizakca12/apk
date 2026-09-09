@@ -75,6 +75,26 @@ function calmpress_widgets_init() {
 add_action( 'widgets_init', 'calmpress_widgets_init' );
 
 /**
+ * Hide the block Categories widget from singular content sidebars.
+ *
+ * @param WP_Widget|null $instance Widget instance.
+ * @param array          $widget Widget arguments.
+ * @param array          $args Sidebar arguments.
+ * @return WP_Widget|null
+ */
+function calmpress_hide_content_categories_widget( $instance, $widget, $args ) {
+	if ( ! is_singular() || empty( $args['id'] ) || 'sidebar-primary' !== $args['id'] || ! is_object( $widget ) || 'WP_Widget_Block' !== get_class( $widget ) ) {
+		return $instance;
+	}
+	$content = isset( $instance['content'] ) ? (string) $instance['content'] : '';
+	if ( false !== strpos( $content, '"core/categories"' ) ) {
+		return false;
+	}
+	return $instance;
+}
+add_filter( 'widget_display_callback', 'calmpress_hide_content_categories_widget', 10, 3 );
+
+/**
  * Enqueue the small, dependency-free front-end assets.
  *
  * @return void
