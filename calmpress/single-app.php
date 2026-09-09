@@ -18,7 +18,7 @@ get_header();
 					<?php if ( has_excerpt() ) : ?><p class="entry-meta"><?php echo esc_html( get_the_excerpt() ); ?></p><?php endif; ?>
 					<?php $download_url = calmpress_app_detail( get_the_ID(), 'download_url' ); ?>
 					<?php if ( $download_url ) : ?>
-						<a class="button app-download" href="<?php echo esc_url( $download_url ); ?>" rel="nofollow sponsored"><?php esc_html_e( 'APK indir', 'calmpress' ); ?></a>
+						<a class="button app-download" href="<?php echo esc_url( $download_url ); ?>" rel="nofollow sponsored"><?php echo esc_html( calmpress_get_option( 'calmpress_app_download_label' ) ? calmpress_get_option( 'calmpress_app_download_label' ) : __( 'APK indir', 'calmpress' ) ); ?></a>
 					<?php endif; ?>
 				</div>
 				<div>
@@ -26,7 +26,7 @@ get_header();
 				</div>
 			</div>
 			<div class="content-card">
-				<dl class="app-details">
+				<?php if ( calmpress_get_option( 'calmpress_show_app_facts' ) ) : ?><dl class="app-details">
 					<?php
 					$app_fields = array(
 						'version'   => __( 'Sürüm', 'calmpress' ),
@@ -42,7 +42,7 @@ get_header();
 						?>
 						<div class="app-detail"><dt><?php echo esc_html( $label ); ?></dt><dd><?php echo esc_html( $value ); ?></dd></div>
 					<?php endforeach; ?>
-				</dl>
+				</dl><?php endif; ?>
 				<div class="entry-content"><?php the_content(); ?></div>
 			</div>
 		</article>

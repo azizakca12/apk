@@ -5,7 +5,7 @@
  * @package CalmPress
  */
 ?>
-<footer class="site-footer">
+<footer class="site-footer site-footer--columns-<?php echo esc_attr( min( 4, max( 1, absint( calmpress_get_option( 'calmpress_footer_columns' ) ) ) ) ); ?>">
 	<div class="site-footer__inner">
 		<div>
 			<p>&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></p>
@@ -53,6 +53,9 @@
 	</div>
 </footer>
 <?php calmpress_render_ad( 'footer' ); ?>
+<?php if ( calmpress_get_option( 'calmpress_back_to_top' ) ) : ?>
+	<button type="button" class="back-to-top" data-back-to-top aria-label="<?php esc_attr_e( 'Sayfanın başına dön', 'calmpress' ); ?>"><span aria-hidden="true">↑</span><span class="screen-reader-text"><?php esc_html_e( 'Başa dön', 'calmpress' ); ?></span></button>
+<?php endif; ?>
 <?php wp_footer(); ?>
 </body>
 </html>

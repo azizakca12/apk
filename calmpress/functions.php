@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'CALMPRESS_VERSION', '1.0.0' );
 
 require_once get_template_directory() . '/inc/admin.php';
+require_once get_template_directory() . '/inc/customizer.php';
 
 /**
  * Set up theme defaults and supported features.
@@ -94,11 +95,31 @@ function calmpress_enqueue_assets() {
 				'dark'   => __( 'Koyu', 'calmpress' ),
 			),
 			'activate' => __( 'Değiştirmek için etkinleştirin.', 'calmpress' ),
+			'defaultTheme' => calmpress_get_option( 'calmpress_theme_default' ),
+			'shareCopied' => __( 'Bağlantı kopyalandı.', 'calmpress' ),
+			'sharePrompt' => __( 'Bağlantıyı kopyalayın:', 'calmpress' ),
 		)
 	);
 	wp_script_add_data( 'calmpress-theme', 'strategy', 'defer' );
 }
 add_action( 'wp_enqueue_scripts', 'calmpress_enqueue_assets' );
+
+/**
+ * Add design preference classes to the document body.
+ *
+ * @param string[] $classes Body classes.
+ * @return string[]
+ */
+function calmpress_body_classes( $classes ) {
+	if ( calmpress_get_option( 'calmpress_high_contrast' ) ) {
+		$classes[] = 'calmpress-high-contrast';
+	}
+	if ( calmpress_get_option( 'calmpress_reduced_motion' ) ) {
+		$classes[] = 'calmpress-reduced-motion';
+	}
+	return $classes;
+}
+add_filter( 'body_class', 'calmpress_body_classes' );
 
 /**
  * Register the APK app post type and its category taxonomy.
@@ -379,14 +400,34 @@ add_action( 'after_switch_theme', 'calmpress_activate' );
  */
 function calmpress_print_design_variables() {
 	$accent = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_color' ) );
+	$accent_hover = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_hover' ) );
+	$accent_contrast = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_contrast' ) );
+	$focus = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_focus_color' ) );
 	$width  = calmpress_sanitize_container_width( calmpress_get_option( 'calmpress_container_width' ) );
 	$cards  = calmpress_sanitize_cards_per_row( calmpress_get_option( 'calmpress_cards_per_row' ) );
 	$radius = calmpress_sanitize_border_radius( calmpress_get_option( 'calmpress_border_radius' ) );
 	$density = calmpress_sanitize_density( calmpress_get_option( 'calmpress_density' ) );
 	$density_space = array( 'compact' => '.85rem', 'comfortable' => '1rem', 'spacious' => '1.2rem' );
-	printf( '<style id="calmpress-settings-vars">:root{--cp-accent:%1$s;--cp-content-width:%2$spx;--cp-card-columns:%3$d;--cp-radius:%4$spx;--cp-density:%5$s;--cp-density-space:%6$s;}</style>', esc_attr( $accent ), esc_attr( $width ), absint( $cards ), absint( $radius ), esc_attr( $density ), esc_attr( $density_space[ $density ] ) );
+	$body_font = 'readable' === calmpress_get_option( 'calmpress_body_font' ) ? 'Atkinson Hyperlegible, "Segoe UI", Helvetica, Arial, sans-serif' : '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+	$heading_font = 'readable' === calmpress_get_option( 'calmpress_heading_font' ) ? 'Atkinson Hyperlegible, "Segoe UI", Helvetica, Arial, sans-serif' : '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif';
+	printf( '<style id="calmpress-settings-vars">:root{--cp-accent:%1$s;--cp-accent-hover:%2$s;--cp-accent-contrast:%3$s;--cp-focus:%4$s;--cp-content-width:%5$spx;--cp-card-columns:%6$d;--cp-radius:%7$spx;--cp-density:%8$s;--cp-density-space:%9$s;--cp-font-body:%10$s;--cp-font-heading:%11$s;}</style>', esc_attr( $accent ), esc_attr( $accent_hover ), esc_attr( $accent_contrast ), esc_attr( $focus ), esc_attr( $width ), absint( $cards ), absint( $radius ), esc_attr( $density ), esc_attr( $density_space[ $density ] ), esc_attr( $body_font ), esc_attr( $heading_font ) );
 }
 add_action( 'wp_head', 'calmpress_print_design_variables', 20 );
+
+/**
+ * Print the restricted custom CSS entered in CalmPress Studio.
+ *
+ * @return void
+ */
+function calmpress_print_custom_css() {
+	$css = function_exists( 'calmpress_customize_css' ) ? calmpress_customize_css( calmpress_get_option( 'calmpress_custom_css' ) ) : '';
+	if ( '' === $css ) {
+		return;
+	}
+	$css = preg_replace( '/<\/style/i', '', wp_strip_all_tags( $css ) );
+	printf( '<style id="calmpress-custom-css">%s</style>', $css );
+}
+add_action( 'wp_head', 'calmpress_print_custom_css', 21 );
 
 /**
  * Disable emoji assets when requested.

@@ -10,8 +10,8 @@ get_header();
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
 	<header class="archive-header">
-		<h1><?php post_type_archive_title(); ?></h1>
-		<p><?php esc_html_e( 'Yararlı Android uygulamalarını açık bilgiler ve doğrudan indirme bağlantılarıyla keşfedin.', 'calmpress' ); ?></p>
+		<h1><?php echo esc_html( calmpress_get_option( 'calmpress_apps_archive_title' ) ? calmpress_get_option( 'calmpress_apps_archive_title' ) : post_type_archive_title( '', false ) ); ?></h1>
+		<p><?php echo esc_html( calmpress_get_option( 'calmpress_apps_archive_description' ) ? calmpress_get_option( 'calmpress_apps_archive_description' ) : __( 'Yararlı Android uygulamalarını açık bilgiler ve doğrudan indirme bağlantılarıyla keşfedin.', 'calmpress' ) ); ?></p>
 	</header>
 	<?php if ( have_posts() ) : ?>
 		<div class="card-grid">

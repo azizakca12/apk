@@ -14,9 +14,11 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <a class="screen-reader-text" href="#primary"><?php esc_html_e( 'İçeriğe geç', 'calmpress' ); ?></a>
-<header class="site-header">
+<?php $announcement_style = function_exists( 'calmpress_customize_announcement_style' ) ? calmpress_customize_announcement_style( calmpress_get_option( 'calmpress_announcement_style' ) ) : 'soft'; ?>
+<?php $nav_style = function_exists( 'calmpress_customize_nav_style' ) ? calmpress_customize_nav_style( calmpress_get_option( 'calmpress_primary_nav_style' ) ) : 'minimal'; ?>
+<header class="site-header <?php echo calmpress_get_option( 'calmpress_sticky_header' ) ? 'is-sticky' : 'is-static'; ?>">
 	<?php if ( calmpress_get_option( 'calmpress_announcement_text' ) ) : ?>
-		<div class="site-announcement">
+		<div class="site-announcement site-announcement--<?php echo esc_attr( $announcement_style ); ?>">
 			<?php if ( calmpress_get_option( 'calmpress_announcement_link' ) ) : ?>
 				<a href="<?php echo esc_url( calmpress_get_option( 'calmpress_announcement_link' ) ); ?>"><?php echo esc_html( calmpress_get_option( 'calmpress_announcement_text' ) ); ?></a>
 			<?php else : ?>
@@ -33,7 +35,7 @@
 				<span class="site-branding__name"><?php bloginfo( 'name' ); ?></span>
 			</a>
 		</div>
-		<nav class="primary-navigation" aria-label="<?php esc_attr_e( 'Birincil gezinme', 'calmpress' ); ?>">
+		<nav class="primary-navigation primary-navigation--<?php echo esc_attr( $nav_style ); ?>" aria-label="<?php esc_attr_e( 'Birincil gezinme', 'calmpress' ); ?>">
 			<?php
 			wp_nav_menu(
 				array(
@@ -49,6 +51,8 @@
 			<span class="theme-toggle__label"><?php esc_html_e( 'Tema', 'calmpress' ); ?></span>
 		</button>
 	</div>
-	<?php calmpress_render_widget_area( 'header' ); ?>
+	<?php if ( calmpress_get_option( 'calmpress_show_header_widgets' ) ) : ?>
+		<?php calmpress_render_widget_area( 'header' ); ?>
+	<?php endif; ?>
 </header>
 <?php calmpress_render_ad( 'header' ); ?>

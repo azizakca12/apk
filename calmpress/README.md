@@ -43,7 +43,19 @@ for `/apps/`, visit **Settings → Permalinks** and press **Save Changes**.
 ## Customization
 
 Use the Site Identity, Menus, Reading, and Widgets screens to customize the
-theme. Child themes can override any template or enqueue additional styles.
+theme. The **Appearance → Customize → CalmPress Studio** workspace adds live
+preview controls for the complete visual system: accent and focus colors,
+content width, card density, corner radius, system/readable font stacks,
+default color mode, reduced motion, sticky header, announcement styles,
+navigation treatments, homepage hero and section visibility, archive copy,
+excerpt length, app facts and download labels, footer layout, social links,
+share buttons, back-to-top navigation, contrast, image loading, embeds,
+emoji, Dashicons, and ad placement visibility. Child themes can override any
+template or enqueue additional styles.
+
+The optional Custom CSS field accepts a bounded, CSS-only snippet. It strips
+HTML, script-like CSS constructs, and style tags before output. Do not paste
+PHP, JavaScript, or HTML into it; the warning in the Customizer is deliberate.
 
 ### CalmPress Settings panel
 

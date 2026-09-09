@@ -10,23 +10,30 @@ get_header();
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
 	<?php calmpress_render_widget_area( 'home-before' ); ?>
-	<section class="hero" aria-labelledby="hero-title">
-		<p class="badge"><?php esc_html_e( 'Özenli yayıncılık ve uygulama keşfi', 'calmpress' ); ?></p>
-		<h1 id="hero-title"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></h1>
-		<p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
+	<section class="hero <?php echo calmpress_get_option( 'calmpress_gradient_background' ) ? 'hero--gradient' : ''; ?>" aria-labelledby="hero-title">
+		<?php $hero_eyebrow = calmpress_get_option( 'calmpress_hero_eyebrow' ); ?>
+		<?php $hero_title = calmpress_get_option( 'calmpress_hero_title' ) ? calmpress_get_option( 'calmpress_hero_title' ) : get_bloginfo( 'name' ); ?>
+		<?php $hero_description = calmpress_get_option( 'calmpress_hero_description' ) ? calmpress_get_option( 'calmpress_hero_description' ) : get_bloginfo( 'description' ); ?>
+		<?php if ( $hero_eyebrow ) : ?><p class="badge"><?php echo esc_html( $hero_eyebrow ); ?></p><?php endif; ?>
+		<h1 id="hero-title"><?php echo esc_html( $hero_title ); ?></h1>
+		<?php if ( $hero_description ) : ?><p><?php echo esc_html( $hero_description ); ?></p><?php endif; ?>
+		<?php if ( calmpress_get_option( 'calmpress_hero_cta_text' ) && calmpress_get_option( 'calmpress_hero_cta_link' ) ) : ?>
+			<a class="button hero__cta" href="<?php echo esc_url( calmpress_get_option( 'calmpress_hero_cta_link' ) ); ?>"><?php echo esc_html( calmpress_get_option( 'calmpress_hero_cta_text' ) ); ?></a>
+		<?php endif; ?>
 	</section>
 
 	<?php
+	$section_cards = min( 4, max( 1, absint( calmpress_get_option( 'calmpress_cards_per_section' ) ) ) );
 	$latest_posts = new WP_Query(
 		array(
 			'post_type'           => 'post',
-			'posts_per_page'      => 3,
+			'posts_per_page'      => $section_cards,
 			'ignore_sticky_posts' => true,
 			'no_found_rows'       => true,
 		)
 	);
 	?>
-	<?php if ( $latest_posts->have_posts() ) : ?>
+	<?php if ( calmpress_get_option( 'calmpress_show_latest_journal' ) && $latest_posts->have_posts() ) : ?>
 		<section aria-labelledby="latest-title">
 			<div class="section-heading">
 				<h2 id="latest-title"><?php esc_html_e( 'Günlükten son yazılar', 'calmpress' ); ?></h2>
@@ -45,13 +52,13 @@ get_header();
 	$latest_apps = new WP_Query(
 		array(
 			'post_type'      => 'app',
-			'posts_per_page' => 3,
+			'posts_per_page' => $section_cards,
 			'no_found_rows'  => true,
 		)
 	);
 	?>
-	<?php if ( $latest_apps->have_posts() ) : ?>
-		<section class="section-spaced" aria-labelledby="apps-title">
+	<?php if ( calmpress_get_option( 'calmpress_show_featured_apps' ) && $latest_apps->have_posts() ) : ?>
+		<section class="section-spaced section-spaced--<?php echo esc_attr( calmpress_get_option( 'calmpress_section_spacing' ) ); ?>" aria-labelledby="apps-title">
 			<div class="section-heading">
 				<h2 id="apps-title"><?php esc_html_e( 'Öne çıkan uygulamalar', 'calmpress' ); ?></h2>
 				<a href="<?php echo esc_url( get_post_type_archive_link( 'app' ) ); ?>"><?php esc_html_e( 'Uygulamalara göz at', 'calmpress' ); ?></a>

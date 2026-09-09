@@ -10,8 +10,10 @@ get_header();
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
 	<header class="archive-header">
-		<h1><?php the_archive_title(); ?></h1>
-		<?php the_archive_description( '<p>', '</p>' ); ?>
+		<?php $archive_title = is_home() && calmpress_get_option( 'calmpress_blog_archive_title' ) ? calmpress_get_option( 'calmpress_blog_archive_title' ) : ''; ?>
+		<?php $archive_description = is_home() && calmpress_get_option( 'calmpress_blog_archive_description' ) ? calmpress_get_option( 'calmpress_blog_archive_description' ) : ''; ?>
+		<?php if ( $archive_title ) : ?><h1><?php echo esc_html( $archive_title ); ?></h1><?php else : ?><h1><?php the_archive_title(); ?></h1><?php endif; ?>
+		<?php if ( $archive_description ) : ?><p><?php echo esc_html( $archive_description ); ?></p><?php else : ?><?php the_archive_description( '<p>', '</p>' ); ?><?php endif; ?>
 	</header>
 	<?php if ( have_posts() ) : ?>
 		<div class="card-grid">
