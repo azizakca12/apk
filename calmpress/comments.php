@@ -11,7 +11,7 @@ if ( post_password_required() ) {
 ?>
 <section id="comments" class="comments-area">
 	<?php if ( have_comments() ) : ?>
-		<h2><?php comments_number( esc_html__( 'No comments yet', 'calmpress' ), esc_html__( 'One comment', 'calmpress' ), esc_html__( '% comments', 'calmpress' ) ); ?></h2>
+		<h2><?php comments_number( esc_html__( 'Henüz yorum yok', 'calmpress' ), esc_html__( 'Bir yorum', 'calmpress' ), esc_html__( '% yorum', 'calmpress' ) ); ?></h2>
 		<ol class="comment-list">
 			<?php wp_list_comments( array( 'style' => 'ol', 'avatar_size' => 44, 'short_ping' => true ) ); ?>
 		</ol>
@@ -20,7 +20,7 @@ if ( post_password_required() ) {
 	<?php
 	comment_form(
 		array(
-			'title_reply'        => esc_html__( 'Leave a comment', 'calmpress' ),
+			'title_reply'        => esc_html__( 'Yorum bırakın', 'calmpress' ),
 			'class_submit'       => 'button',
 			'comment_notes_after' => '',
 		)

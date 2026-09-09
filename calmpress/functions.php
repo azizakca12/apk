@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'CALMPRESS_VERSION', '1.0.0' );
 
+require_once get_template_directory() . '/inc/admin.php';
+
 /**
  * Set up theme defaults and supported features.
  *
@@ -33,8 +35,8 @@ function calmpress_setup() {
 
 	register_nav_menus(
 		array(
-			'primary' => esc_html__( 'Primary menu', 'calmpress' ),
-			'footer'  => esc_html__( 'Footer menu', 'calmpress' ),
+			'primary' => esc_html__( 'Birincil menü', 'calmpress' ),
+			'footer'  => esc_html__( 'Alt bilgi menüsü', 'calmpress' ),
 		)
 	);
 }
@@ -47,12 +49,12 @@ add_action( 'after_setup_theme', 'calmpress_setup' );
  */
 function calmpress_widgets_init() {
 	$areas = array(
-		'header'         => array( __( 'Header', 'calmpress' ), __( 'Widgets shown in the site header.', 'calmpress' ) ),
-		'after-content'  => array( __( 'After content', 'calmpress' ), __( 'Widgets shown after the main content.', 'calmpress' ) ),
-		'sidebar-primary' => array( __( 'Sidebar', 'calmpress' ), __( 'Widgets shown beside archive and article content.', 'calmpress' ) ),
-		'home-before'    => array( __( 'Home before content', 'calmpress' ), __( 'Widgets shown before homepage sections.', 'calmpress' ) ),
-		'home-after'     => array( __( 'Home after content', 'calmpress' ), __( 'Widgets shown after homepage sections.', 'calmpress' ) ),
-		'footer-1'       => array( __( 'Footer', 'calmpress' ), __( 'Optional footer widgets.', 'calmpress' ) ),
+		'header'         => array( __( 'Üst bilgi', 'calmpress' ), __( 'Site üst bilgisinde gösterilen bileşenler.', 'calmpress' ) ),
+		'after-content'  => array( __( 'İçerik sonrası', 'calmpress' ), __( 'Ana içerikten sonra gösterilen bileşenler.', 'calmpress' ) ),
+		'sidebar-primary' => array( __( 'Kenar çubuğu', 'calmpress' ), __( 'Arşiv ve yazı içeriğinin yanında gösterilen bileşenler.', 'calmpress' ) ),
+		'home-before'    => array( __( 'Ana sayfa içerik öncesi', 'calmpress' ), __( 'Ana sayfa bölümlerinden önce gösterilen bileşenler.', 'calmpress' ) ),
+		'home-after'     => array( __( 'Ana sayfa içerik sonrası', 'calmpress' ), __( 'Ana sayfa bölümlerinden sonra gösterilen bileşenler.', 'calmpress' ) ),
+		'footer-1'       => array( __( 'Alt bilgi', 'calmpress' ), __( 'İsteğe bağlı alt bilgi bileşenleri.', 'calmpress' ) ),
 	);
 	foreach ( $areas as $id => $area ) {
 		register_sidebar(
@@ -87,11 +89,11 @@ function calmpress_enqueue_assets() {
 		'calmpressTheme',
 		array(
 			'labels' => array(
-				'system' => __( 'System', 'calmpress' ),
-				'light'  => __( 'Light', 'calmpress' ),
-				'dark'   => __( 'Dark', 'calmpress' ),
+				'system' => __( 'Sistem', 'calmpress' ),
+				'light'  => __( 'Açık', 'calmpress' ),
+				'dark'   => __( 'Koyu', 'calmpress' ),
 			),
-			'activate' => __( 'Activate to change.', 'calmpress' ),
+			'activate' => __( 'Değiştirmek için etkinleştirin.', 'calmpress' ),
 		)
 	);
 	wp_script_add_data( 'calmpress-theme', 'strategy', 'defer' );
@@ -108,16 +110,16 @@ function calmpress_register_app_content() {
 		'app',
 		array(
 			'labels' => array(
-				'name'               => esc_html__( 'Apps', 'calmpress' ),
-				'singular_name'      => esc_html__( 'App', 'calmpress' ),
-				'add_new'            => esc_html__( 'Add app', 'calmpress' ),
-				'add_new_item'       => esc_html__( 'Add new app', 'calmpress' ),
-				'edit_item'          => esc_html__( 'Edit app', 'calmpress' ),
-				'new_item'           => esc_html__( 'New app', 'calmpress' ),
-				'view_item'          => esc_html__( 'View app', 'calmpress' ),
-				'search_items'       => esc_html__( 'Search apps', 'calmpress' ),
-				'not_found'          => esc_html__( 'No apps found', 'calmpress' ),
-				'menu_name'          => esc_html__( 'Apps', 'calmpress' ),
+				'name'               => esc_html__( 'Uygulamalar', 'calmpress' ),
+				'singular_name'      => esc_html__( 'Uygulama', 'calmpress' ),
+				'add_new'            => esc_html__( 'Uygulama ekle', 'calmpress' ),
+				'add_new_item'       => esc_html__( 'Yeni uygulama ekle', 'calmpress' ),
+				'edit_item'          => esc_html__( 'Uygulamayı düzenle', 'calmpress' ),
+				'new_item'           => esc_html__( 'Yeni uygulama', 'calmpress' ),
+				'view_item'          => esc_html__( 'Uygulamayı görüntüle', 'calmpress' ),
+				'search_items'       => esc_html__( 'Uygulama ara', 'calmpress' ),
+				'not_found'          => esc_html__( 'Uygulama bulunamadı', 'calmpress' ),
+				'menu_name'          => esc_html__( 'Uygulamalar', 'calmpress' ),
 			),
 			'public'              => true,
 			'show_in_rest'        => true,
@@ -136,9 +138,9 @@ function calmpress_register_app_content() {
 		array( 'app' ),
 		array(
 			'labels'            => array(
-				'name'          => esc_html__( 'App categories', 'calmpress' ),
-				'singular_name' => esc_html__( 'App category', 'calmpress' ),
-				'menu_name'     => esc_html__( 'Categories', 'calmpress' ),
+				'name'          => esc_html__( 'Uygulama kategorileri', 'calmpress' ),
+				'singular_name' => esc_html__( 'Uygulama kategorisi', 'calmpress' ),
+				'menu_name'     => esc_html__( 'Kategoriler', 'calmpress' ),
 			),
 			'public'            => true,
 			'show_in_rest'      => true,
@@ -158,7 +160,7 @@ add_action( 'init', 'calmpress_register_app_content' );
 function calmpress_add_app_meta_box() {
 	add_meta_box(
 		'calmpress-app-details',
-		esc_html__( 'App details', 'calmpress' ),
+		esc_html__( 'Uygulama ayrıntıları', 'calmpress' ),
 		'calmpress_render_app_meta_box',
 		'app',
 		'normal',
@@ -176,11 +178,11 @@ add_action( 'add_meta_boxes_app', 'calmpress_add_app_meta_box' );
 function calmpress_render_app_meta_box( $post ) {
 	wp_nonce_field( 'calmpress_save_app_details', 'calmpress_app_nonce' );
 	$fields = array(
-		'download_url' => array( 'label' => __( 'Download URL', 'calmpress' ), 'type' => 'url' ),
-		'version'      => array( 'label' => __( 'Version', 'calmpress' ), 'type' => 'text' ),
-		'file_size'    => array( 'label' => __( 'File size', 'calmpress' ), 'type' => 'text' ),
+		'download_url' => array( 'label' => __( 'İndirme URL’si', 'calmpress' ), 'type' => 'url' ),
+		'version'      => array( 'label' => __( 'Sürüm', 'calmpress' ), 'type' => 'text' ),
+		'file_size'    => array( 'label' => __( 'Dosya boyutu', 'calmpress' ), 'type' => 'text' ),
 		'platform'     => array( 'label' => __( 'Platform', 'calmpress' ), 'type' => 'text' ),
-		'developer'    => array( 'label' => __( 'Developer', 'calmpress' ), 'type' => 'text' ),
+		'developer'    => array( 'label' => __( 'Geliştirici', 'calmpress' ), 'type' => 'text' ),
 	);
 	echo '<div class="calmpress-app-fields">';
 	foreach ( $fields as $key => $field ) {
@@ -276,6 +278,21 @@ function calmpress_meta_description() {
 add_action( 'wp_head', 'calmpress_meta_description', 1 );
 
 /**
+ * Use the configured SEO title when a document has no more specific title.
+ *
+ * @param array $parts Document title parts.
+ * @return array
+ */
+function calmpress_document_title_parts( $parts ) {
+	$title = calmpress_get_option( 'calmpress_seo_title' );
+	if ( $title && ( is_front_page() || is_home() ) ) {
+		$parts['title'] = $title;
+	}
+	return $parts;
+}
+add_filter( 'document_title_parts', 'calmpress_document_title_parts' );
+
+/**
  * Add schema.org JSON-LD for posts and apps.
  *
  * @return void
@@ -337,7 +354,7 @@ add_action( 'wp_head', 'calmpress_schema_markup', 20 );
  */
 function calmpress_image_attributes( $attr, $attachment, $size ) {
 	$attr['decoding'] = 'async';
-	if ( ! isset( $attr['loading'] ) ) {
+	if ( calmpress_get_option( 'calmpress_lazy_images' ) && ! isset( $attr['loading'] ) ) {
 		$attr['loading'] = 'lazy';
 	}
 	return $attr;
@@ -356,260 +373,6 @@ function calmpress_activate() {
 add_action( 'after_switch_theme', 'calmpress_activate' );
 
 /**
- * Return the default for a CalmPress setting.
- *
- * @param string $key Setting key.
- * @return mixed
- */
-function calmpress_get_option( $key ) {
-	$defaults = array(
-		'calmpress_accent_color'       => '#356ae6',
-		'calmpress_container_width'    => 1120,
-		'calmpress_cards_per_row'      => 3,
-		'calmpress_announcement_text'  => '',
-		'calmpress_announcement_link'  => '',
-		'calmpress_show_footer_widgets' => 1,
-		'calmpress_seo_description'    => '',
-		'calmpress_organization_name'  => '',
-		'calmpress_organization_logo'  => '',
-		'calmpress_schema_enabled'     => 1,
-		'calmpress_disable_emoji'      => 0,
-		'calmpress_social_facebook'    => '',
-		'calmpress_social_instagram'   => '',
-		'calmpress_social_x'           => '',
-		'calmpress_social_youtube'     => '',
-		'calmpress_social_github'      => '',
-	);
-	if ( 0 === strpos( $key, 'calmpress_ad_' ) ) {
-		$defaults[ $key ] = false;
-	}
-	return get_option( $key, array_key_exists( $key, $defaults ) ? $defaults[ $key ] : '' );
-}
-
-/**
- * Sanitize a theme accent color.
- *
- * @param string $value Submitted color.
- * @return string
- */
-function calmpress_sanitize_accent_color( $value ) {
-	$value = sanitize_hex_color_no_hash( (string) $value );
-	return preg_match( '/^[0-9a-f]{6}$/i', $value ) ? '#' . strtolower( $value ) : '#356ae6';
-}
-
-/**
- * Sanitize a bounded integer setting.
- *
- * @param mixed $value Submitted value.
- * @return int
- */
-function calmpress_sanitize_container_width( $value ) {
-	return min( 1600, max( 960, absint( $value ) ) );
-}
-
-/**
- * Sanitize the number of cards per row.
- *
- * @param mixed $value Submitted value.
- * @return int
- */
-function calmpress_sanitize_cards_per_row( $value ) {
-	return min( 4, max( 1, absint( $value ) ) );
-}
-
-/**
- * Sanitize a checkbox.
- *
- * @param mixed $value Submitted value.
- * @return int
- */
-function calmpress_sanitize_checkbox( $value ) {
-	return empty( $value ) ? 0 : 1;
-}
-
-/**
- * Register settings used by the CalmPress admin panel.
- *
- * @return void
- */
-function calmpress_register_settings() {
-	$settings = array(
-		'calmpress_accent_color'        => 'calmpress_sanitize_accent_color',
-		'calmpress_container_width'     => 'calmpress_sanitize_container_width',
-		'calmpress_cards_per_row'       => 'calmpress_sanitize_cards_per_row',
-		'calmpress_announcement_text'   => 'sanitize_text_field',
-		'calmpress_announcement_link'   => 'esc_url_raw',
-		'calmpress_show_footer_widgets' => 'calmpress_sanitize_checkbox',
-		'calmpress_seo_description'     => 'sanitize_textarea_field',
-		'calmpress_organization_name'   => 'sanitize_text_field',
-		'calmpress_organization_logo'   => 'esc_url_raw',
-		'calmpress_schema_enabled'      => 'calmpress_sanitize_checkbox',
-		'calmpress_disable_emoji'       => 'calmpress_sanitize_checkbox',
-		'calmpress_social_facebook'     => 'esc_url_raw',
-		'calmpress_social_instagram'    => 'esc_url_raw',
-		'calmpress_social_x'            => 'esc_url_raw',
-		'calmpress_social_youtube'      => 'esc_url_raw',
-		'calmpress_social_github'       => 'esc_url_raw',
-	);
-	$placements = array( 'header', 'before_content', 'after_content', 'sidebar', 'footer' );
-	foreach ( $placements as $placement ) {
-		$settings[ 'calmpress_ad_' . $placement . '_enabled' ] = 'calmpress_sanitize_checkbox';
-		$settings[ 'calmpress_ad_' . $placement . '_html' ]    = 'wp_kses_post';
-	}
-	foreach ( $settings as $key => $callback ) {
-		register_setting(
-			'calmpress_settings',
-			$key,
-			array(
-				'type'              => 'string',
-				'sanitize_callback' => $callback,
-				'default'           => calmpress_get_option( $key ),
-			)
-		);
-	}
-}
-add_action( 'admin_init', 'calmpress_register_settings' );
-
-/**
- * Add the settings page and its Settings API sections.
- *
- * @return void
- */
-function calmpress_settings_menu() {
-	add_theme_page(
-		__( 'CalmPress Settings', 'calmpress' ),
-		__( 'CalmPress Settings', 'calmpress' ),
-		'manage_options',
-		'calmpress-settings',
-		'calmpress_render_settings_page'
-	);
-}
-add_action( 'admin_menu', 'calmpress_settings_menu' );
-
-/**
- * Add fields to the CalmPress settings screen.
- *
- * @return void
- */
-function calmpress_settings_sections() {
-	add_settings_section( 'calmpress_general', __( 'General design', 'calmpress' ), '__return_false', 'calmpress-settings' );
-	calmpress_add_settings_field( 'calmpress_accent_color', 'color', __( 'Accent color', 'calmpress' ), __( 'Used for links, buttons, and focus states.', 'calmpress' ), 'calmpress_general' );
-	calmpress_add_settings_field( 'calmpress_container_width', 'number', __( 'Container width (px)', 'calmpress' ), __( 'Choose a value between 960 and 1600 pixels.', 'calmpress' ), 'calmpress_general' );
-	calmpress_add_settings_field( 'calmpress_cards_per_row', 'number', __( 'Cards per row', 'calmpress' ), __( 'Choose 1 to 4 cards on larger screens.', 'calmpress' ), 'calmpress_general' );
-
-	add_settings_section( 'calmpress_header_footer', __( 'Header and footer', 'calmpress' ), '__return_false', 'calmpress-settings' );
-	calmpress_add_settings_field( 'calmpress_announcement_text', 'text', __( 'Announcement text', 'calmpress' ), __( 'An optional accessible notice displayed above the navigation.', 'calmpress' ), 'calmpress_header_footer' );
-	calmpress_add_settings_field( 'calmpress_announcement_link', 'url', __( 'Announcement link', 'calmpress' ), __( 'Optional destination for the announcement.', 'calmpress' ), 'calmpress_header_footer' );
-	calmpress_add_settings_field( 'calmpress_show_footer_widgets', 'checkbox', __( 'Show footer widgets', 'calmpress' ), __( 'Display the Footer widget area in the site footer.', 'calmpress' ), 'calmpress_header_footer' );
-
-	add_settings_section( 'calmpress_seo', __( 'SEO and structured data', 'calmpress' ), '__return_false', 'calmpress-settings' );
-	calmpress_add_settings_field( 'calmpress_seo_description', 'textarea', __( 'Default meta description', 'calmpress' ), __( 'Used when a page or post does not have an excerpt.', 'calmpress' ), 'calmpress_seo' );
-	calmpress_add_settings_field( 'calmpress_organization_name', 'text', __( 'Organization name', 'calmpress' ), __( 'Optional publisher name for structured data.', 'calmpress' ), 'calmpress_seo' );
-	calmpress_add_settings_field( 'calmpress_organization_logo', 'url', __( 'Organization logo URL', 'calmpress' ), __( 'Use a trusted image URL from your media library.', 'calmpress' ), 'calmpress_seo' );
-	calmpress_add_settings_field( 'calmpress_schema_enabled', 'checkbox', __( 'Enable schema.org JSON-LD', 'calmpress' ), __( 'Adds Article or SoftwareApplication metadata to singular pages.', 'calmpress' ), 'calmpress_seo' );
-
-	add_settings_section( 'calmpress_performance', __( 'Performance', 'calmpress' ), '__return_false', 'calmpress-settings' );
-	calmpress_add_settings_field( 'calmpress_disable_emoji', 'checkbox', __( 'Disable WordPress emoji assets', 'calmpress' ), __( 'Avoids loading emoji detection scripts when your site does not need them. Images remain lazy-loaded.', 'calmpress' ), 'calmpress_performance' );
-
-	add_settings_section( 'calmpress_social', __( 'Social links', 'calmpress' ), '__return_false', 'calmpress-settings' );
-	foreach ( array( 'facebook' => __( 'Facebook', 'calmpress' ), 'instagram' => __( 'Instagram', 'calmpress' ), 'x' => __( 'X', 'calmpress' ), 'youtube' => __( 'YouTube', 'calmpress' ), 'github' => __( 'GitHub', 'calmpress' ) ) as $key => $label ) {
-		calmpress_add_settings_field( 'calmpress_social_' . $key, 'url', $label, __( 'Optional profile URL shown in the footer.', 'calmpress' ), 'calmpress_social' );
-	}
-
-	add_settings_section( 'calmpress_ads', __( 'Advertising module', 'calmpress' ), 'calmpress_ads_section_description', 'calmpress-settings' );
-	foreach ( array( 'header' => __( 'Header', 'calmpress' ), 'before_content' => __( 'Before content', 'calmpress' ), 'after_content' => __( 'After content', 'calmpress' ), 'sidebar' => __( 'Sidebar', 'calmpress' ), 'footer' => __( 'Footer', 'calmpress' ) ) as $placement => $label ) {
-		calmpress_add_settings_field( 'calmpress_ad_' . $placement . '_enabled', 'checkbox', sprintf( __( 'Enable %s ad', 'calmpress' ), $label ), __( 'Show this placement on the front end.', 'calmpress' ), 'calmpress_ads' );
-		calmpress_add_settings_field( 'calmpress_ad_' . $placement . '_html', 'textarea', sprintf( __( '%s ad HTML', 'calmpress' ), $label ), __( 'Safe HTML only; script tags and unsafe attributes are stripped automatically.', 'calmpress' ), 'calmpress_ads' );
-	}
-}
-add_action( 'admin_init', 'calmpress_settings_sections' );
-
-/**
- * Register one settings field.
- *
- * @param string $key Setting key.
- * @param string $type Field type.
- * @param string $title Field title.
- * @param string $description Description.
- * @param string $section Section ID.
- * @return void
- */
-function calmpress_add_settings_field( $key, $type, $title, $description, $section ) {
-	add_settings_field(
-		$key,
-		$title,
-		'calmpress_render_setting_field',
-		'calmpress-settings',
-		$section,
-		array(
-			'key'         => $key,
-			'type'        => $type,
-			'description' => $description,
-		)
-	);
-}
-
-/**
- * Render a Settings API field without unsafe direct HTML.
- *
- * @param array $args Field arguments.
- * @return void
- */
-function calmpress_render_setting_field( $args ) {
-	$key   = $args['key'];
-	$type  = $args['type'];
-	$value = calmpress_get_option( $key );
-	$id    = sanitize_key( $key );
-	$attrs = '';
-	if ( 'number' === $type ) {
-		$attrs = false !== strpos( $key, 'cards' ) ? ' min="1" max="4"' : ' min="960" max="1600"';
-	}
-	if ( 'checkbox' === $type ) {
-		printf( '<label><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s> %3$s</label>', esc_attr( $id ), checked( $value, 1, false ), esc_html__( 'Enabled', 'calmpress' ) );
-	} elseif ( 'textarea' === $type ) {
-		printf( '<textarea class="large-text" rows="5" id="%1$s" name="%1$s">%2$s</textarea>', esc_attr( $id ), esc_textarea( (string) $value ) );
-	} else {
-		printf( '<input class="regular-text" type="%1$s" id="%2$s" name="%2$s" value="%3$s"%4$s>', esc_attr( $type ), esc_attr( $id ), esc_attr( (string) $value ), $attrs );
-	}
-	if ( ! empty( $args['description'] ) ) {
-		printf( '<p class="description">%s</p>', esc_html( $args['description'] ) );
-	}
-}
-
-/**
- * Explain ad sanitization in the settings screen.
- *
- * @return void
- */
-function calmpress_ads_section_description() {
-	echo '<p>' . esc_html__( 'Ads are disabled by default. Add markup such as links, images, and text. For safety, script tags, event handlers, and unsafe attributes are stripped by WordPress.', 'calmpress' ) . '</p>';
-}
-
-/**
- * Render the CalmPress settings screen.
- *
- * @return void
- */
-function calmpress_render_settings_page() {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'You do not have permission to access this page.', 'calmpress' ) );
-	}
-	?>
-	<div class="wrap">
-		<h1><?php esc_html_e( 'CalmPress Settings', 'calmpress' ); ?></h1>
-		<p><?php esc_html_e( 'Configure the theme, accessibility-friendly advertising placements, widgets, and social profiles from one place.', 'calmpress' ); ?></p>
-		<form action="options.php" method="post">
-			<?php
-			settings_fields( 'calmpress_settings' );
-			do_settings_sections( 'calmpress-settings' );
-			submit_button();
-			?>
-		</form>
-	</div>
-	<?php
-}
-
-/**
  * Output front-end design variables from the settings panel.
  *
  * @return void
@@ -618,9 +381,12 @@ function calmpress_print_design_variables() {
 	$accent = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_color' ) );
 	$width  = calmpress_sanitize_container_width( calmpress_get_option( 'calmpress_container_width' ) );
 	$cards  = calmpress_sanitize_cards_per_row( calmpress_get_option( 'calmpress_cards_per_row' ) );
-	printf( '<style id="calmpress-settings-vars">:root{--cp-accent:%1$s;--cp-content-width:%2$spx;--cp-card-columns:%3$d;}</style>', esc_attr( $accent ), esc_attr( $width ), absint( $cards ) );
+	$radius = calmpress_sanitize_border_radius( calmpress_get_option( 'calmpress_border_radius' ) );
+	$density = calmpress_sanitize_density( calmpress_get_option( 'calmpress_density' ) );
+	$density_space = array( 'compact' => '.85rem', 'comfortable' => '1rem', 'spacious' => '1.2rem' );
+	printf( '<style id="calmpress-settings-vars">:root{--cp-accent:%1$s;--cp-content-width:%2$spx;--cp-card-columns:%3$d;--cp-radius:%4$spx;--cp-density:%5$s;--cp-density-space:%6$s;}</style>', esc_attr( $accent ), esc_attr( $width ), absint( $cards ), absint( $radius ), esc_attr( $density ), esc_attr( $density_space[ $density ] ) );
 }
-add_action( 'wp_head', 'calmpress_print_design_variables', 5 );
+add_action( 'wp_head', 'calmpress_print_design_variables', 20 );
 
 /**
  * Disable emoji assets when requested.
@@ -642,6 +408,53 @@ function calmpress_disable_emojis() {
 add_action( 'init', 'calmpress_disable_emojis', 9 );
 
 /**
+ * Remove optional front-end assets when the performance controls request it.
+ *
+ * @return void
+ */
+function calmpress_optimize_frontend_assets() {
+	if ( calmpress_get_option( 'calmpress_disable_dashicons' ) && ! is_user_logged_in() ) {
+		wp_dequeue_style( 'dashicons' );
+		wp_deregister_style( 'dashicons' );
+	}
+	if ( calmpress_get_option( 'calmpress_disable_embeds' ) ) {
+		wp_dequeue_script( 'wp-embed' );
+		wp_deregister_script( 'wp-embed' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'calmpress_optimize_frontend_assets', 100 );
+
+/**
+ * Remove oEmbed discovery hooks when embeds are disabled.
+ *
+ * @return void
+ */
+function calmpress_disable_embeds() {
+	if ( ! calmpress_get_option( 'calmpress_disable_embeds' ) ) {
+		return;
+	}
+	remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+	remove_action( 'wp_head', 'wp_oembed_add_host_js' );
+	remove_filter( 'oembed_dataparse', 'wp_filter_oembed_result', 10 );
+}
+add_action( 'init', 'calmpress_disable_embeds', 9 );
+
+/**
+ * Disable embed discovery when requested.
+ *
+ * @param array $links Discovery links.
+ * @return array
+ */
+function calmpress_filter_embed_links( $links ) {
+	return calmpress_get_option( 'calmpress_disable_embeds' ) ? array() : $links;
+}
+function calmpress_filter_embed_discover( $discover ) {
+	return calmpress_get_option( 'calmpress_disable_embeds' ) ? false : $discover;
+}
+add_filter( 'embed_oembed_discover', 'calmpress_filter_embed_discover' );
+add_filter( 'oembed_links', 'calmpress_filter_embed_links' );
+
+/**
  * Render one sanitized advertising placement.
  *
  * @param string $placement Placement key.
@@ -649,14 +462,15 @@ add_action( 'init', 'calmpress_disable_emojis', 9 );
  */
 function calmpress_render_ad( $placement ) {
 	$allowed = array( 'header', 'before_content', 'after_content', 'sidebar', 'footer' );
-	if ( ! in_array( $placement, $allowed, true ) || ! calmpress_get_option( 'calmpress_ad_' . $placement . '_enabled' ) ) {
+	$global_ads = get_option( 'calmpress_ads_enabled', null );
+	if ( ! in_array( $placement, $allowed, true ) || ( null !== $global_ads && ! $global_ads ) || ! calmpress_get_option( 'calmpress_ad_' . $placement . '_enabled' ) ) {
 		return;
 	}
 	$html = calmpress_get_option( 'calmpress_ad_' . $placement . '_html' );
 	if ( '' === trim( (string) $html ) ) {
 		return;
 	}
-	printf( '<aside class="calmpress-ad calmpress-ad--%1$s" aria-label="%2$s">%3$s</aside>', esc_attr( $placement ), esc_attr__( 'Advertisement', 'calmpress' ), wp_kses_post( $html ) );
+	printf( '<aside class="calmpress-ad calmpress-ad--%1$s" aria-label="%2$s">%3$s</aside>', esc_attr( $placement ), esc_attr__( 'Reklam', 'calmpress' ), wp_kses_post( $html ) );
 }
 
 /**
@@ -702,7 +516,7 @@ class CalmPress_Recent_Apps_Widget extends WP_Widget {
 	 * Construct the widget.
 	 */
 	public function __construct() {
-		parent::__construct( 'calmpress_recent_apps', __( 'CalmPress: Recent Apps', 'calmpress' ), array( 'description' => __( 'Shows the latest apps from the CalmPress app directory.', 'calmpress' ) ) );
+		parent::__construct( 'calmpress_recent_apps', __( 'CalmPress: Son uygulamalar', 'calmpress' ), array( 'description' => __( 'CalmPress uygulama dizinindeki en yeni uygulamaları gösterir.', 'calmpress' ) ) );
 	}
 
 	/**
@@ -713,7 +527,7 @@ class CalmPress_Recent_Apps_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Recent apps', 'calmpress' );
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Son uygulamalar', 'calmpress' );
 		$query = new WP_Query( array( 'post_type' => 'app', 'posts_per_page' => 5, 'no_found_rows' => true ) );
 		if ( ! $query->have_posts() ) {
 			return;
@@ -737,8 +551,8 @@ class CalmPress_Recent_Apps_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function form( $instance ) {
-		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Recent apps', 'calmpress' );
-		printf( '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s"></p>', esc_attr( $this->get_field_id( 'title' ) ), esc_html__( 'Title:', 'calmpress' ), esc_attr( $this->get_field_name( 'title' ) ), esc_attr( $title ) );
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Son uygulamalar', 'calmpress' );
+		printf( '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s"></p>', esc_attr( $this->get_field_id( 'title' ) ), esc_html__( 'Başlık:', 'calmpress' ), esc_attr( $this->get_field_name( 'title' ) ), esc_attr( $title ) );
 	}
 
 	/**

@@ -62,6 +62,8 @@ Apps** widget lists the latest `app` entries.
 
 ### Türkçe kullanım ve çeviri
 
+CalmPress’in varsayılan kullanıcı arayüzü Türkçedir; İngilizce veya başka bir
+dil paketi etkin olduğunda WordPress çevirileri bu metinlerin üzerine yazabilir.
 WordPress’in **Ayarlar → Genel → Site Dili** bölümünden **Türkçe** seçildiğinde
 tema `languages/calmpress-tr_TR.po` çeviri kataloğunu kullanır. WordPress.org
 dil paketleri veya Loco Translate gibi bir araç `.mo` dosyasını oluşturup

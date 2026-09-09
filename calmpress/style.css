@@ -30,6 +30,7 @@ Tags: blog, entertainment, portfolio, accessibility-ready, custom-logo, featured
 	--cp-content-width: 70rem;
 	--cp-wide-width: 88rem;
 	--cp-space: clamp(1rem, 2vw, 1.5rem);
+	--cp-density-space: 1rem;
 	--cp-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	--cp-font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
 	font-family: var(--cp-font-body);
@@ -233,7 +234,7 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .section-heading p { margin: 0; color: var(--cp-text-muted); }
 .section-spaced { margin-top: clamp(3rem, 7vw, 6rem); }
 
-.card-grid { display: grid; grid-template-columns: repeat(var(--cp-card-columns, 3), minmax(0, 1fr)); gap: clamp(1rem, 2.5vw, 1.5rem); }
+.card-grid { display: grid; grid-template-columns: repeat(var(--cp-card-columns, 3), minmax(0, 1fr)); gap: var(--cp-density-space, clamp(1rem, 2.5vw, 1.5rem)); }
 .post-card,
 .app-card,
 .content-card {
@@ -247,7 +248,7 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .app-card__image { aspect-ratio: 16 / 9; width: 100%; object-fit: cover; }
 .post-card__body,
 .app-card__body,
-.content-card__body { padding: clamp(1rem, 2.5vw, 1.5rem); }
+.content-card__body { padding: var(--cp-density-space, clamp(1rem, 2.5vw, 1.5rem)); }
 .post-card .entry-title,
 .app-card .entry-title { font-size: 1.35rem; }
 .post-card p,

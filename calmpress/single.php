@@ -19,9 +19,9 @@ get_header();
 			<?php if ( has_post_thumbnail() ) : the_post_thumbnail( 'large', array( 'class' => 'featured-image', 'loading' => 'eager', 'fetchpriority' => 'high' ) ); endif; ?>
 			<div class="content-card">
 				<div class="entry-content"><?php the_content(); ?></div>
-				<?php wp_link_pages( array( 'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Pages', 'calmpress' ) . '">', 'after' => '</nav>' ) ); ?>
+				<?php wp_link_pages( array( 'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Sayfalar', 'calmpress' ) . '">', 'after' => '</nav>' ) ); ?>
 			</div>
-			<nav class="post-navigation" aria-label="<?php esc_attr_e( 'Post navigation', 'calmpress' ); ?>">
+			<nav class="post-navigation" aria-label="<?php esc_attr_e( 'Yazı gezinmesi', 'calmpress' ); ?>">
 				<div class="nav-previous"><?php previous_post_link( '%link', '← %title' ); ?></div>
 				<div class="nav-next"><?php next_post_link( '%link', '%title →' ); ?></div>
 			</nav>

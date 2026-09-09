@@ -11,7 +11,7 @@ get_header();
 	<?php calmpress_render_before_content(); ?>
 	<?php calmpress_render_widget_area( 'home-before' ); ?>
 	<section class="hero" aria-labelledby="hero-title">
-		<p class="badge"><?php esc_html_e( 'Thoughtful publishing & app discovery', 'calmpress' ); ?></p>
+		<p class="badge"><?php esc_html_e( 'Özenli yayıncılık ve uygulama keşfi', 'calmpress' ); ?></p>
 		<h1 id="hero-title"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></h1>
 		<p><?php echo esc_html( get_bloginfo( 'description' ) ); ?></p>
 	</section>
@@ -29,9 +29,9 @@ get_header();
 	<?php if ( $latest_posts->have_posts() ) : ?>
 		<section aria-labelledby="latest-title">
 			<div class="section-heading">
-				<h2 id="latest-title"><?php esc_html_e( 'Latest from the journal', 'calmpress' ); ?></h2>
+				<h2 id="latest-title"><?php esc_html_e( 'Günlükten son yazılar', 'calmpress' ); ?></h2>
 				<?php $blog_url = get_option( 'page_for_posts' ) ? get_permalink( (int) get_option( 'page_for_posts' ) ) : home_url( '/' ); ?>
-				<a href="<?php echo esc_url( $blog_url ); ?>"><?php esc_html_e( 'View all', 'calmpress' ); ?></a>
+				<a href="<?php echo esc_url( $blog_url ); ?>"><?php esc_html_e( 'Tümünü gör', 'calmpress' ); ?></a>
 			</div>
 			<div class="card-grid">
 				<?php while ( $latest_posts->have_posts() ) : $latest_posts->the_post(); ?>
@@ -53,8 +53,8 @@ get_header();
 	<?php if ( $latest_apps->have_posts() ) : ?>
 		<section class="section-spaced" aria-labelledby="apps-title">
 			<div class="section-heading">
-				<h2 id="apps-title"><?php esc_html_e( 'Featured apps', 'calmpress' ); ?></h2>
-				<a href="<?php echo esc_url( get_post_type_archive_link( 'app' ) ); ?>"><?php esc_html_e( 'Browse apps', 'calmpress' ); ?></a>
+				<h2 id="apps-title"><?php esc_html_e( 'Öne çıkan uygulamalar', 'calmpress' ); ?></h2>
+				<a href="<?php echo esc_url( get_post_type_archive_link( 'app' ) ); ?>"><?php esc_html_e( 'Uygulamalara göz at', 'calmpress' ); ?></a>
 			</div>
 			<div class="card-grid">
 				<?php while ( $latest_apps->have_posts() ) : $latest_apps->the_post(); ?>

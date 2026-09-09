@@ -9,7 +9,7 @@ if ( ! is_active_sidebar( 'sidebar-primary' ) && ! calmpress_get_option( 'calmpr
 	return;
 }
 ?>
-<aside class="site-sidebar" aria-label="<?php esc_attr_e( 'Sidebar', 'calmpress' ); ?>">
+<aside class="site-sidebar" aria-label="<?php esc_attr_e( 'Kenar çubuğu', 'calmpress' ); ?>">
 	<?php calmpress_render_widget_area( 'sidebar-primary' ); ?>
 	<?php calmpress_render_ad( 'sidebar' ); ?>
 </aside>

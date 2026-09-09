@@ -9,6 +9,7 @@
 	<div class="site-footer__inner">
 		<div>
 			<p>&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></p>
+			<?php if ( calmpress_get_option( 'calmpress_footer_text' ) ) : ?><p><?php echo esc_html( calmpress_get_option( 'calmpress_footer_text' ) ); ?></p><?php endif; ?>
 			<?php if ( calmpress_get_option( 'calmpress_show_footer_widgets' ) ) : ?>
 				<?php calmpress_render_widget_area( 'footer-1' ); ?>
 			<?php endif; ?>
@@ -29,14 +30,15 @@
 			}
 			?>
 			<?php if ( $active_socials ) : ?>
-				<nav class="social-navigation" aria-label="<?php esc_attr_e( 'Social links', 'calmpress' ); ?>">
+				<nav class="social-navigation" aria-label="<?php esc_attr_e( 'Sosyal bağlantılar', 'calmpress' ); ?>">
 					<?php foreach ( $active_socials as $label => $url ) : ?>
 						<a href="<?php echo esc_url( $url ); ?>" rel="me"><?php echo esc_html( $label ); ?></a>
 					<?php endforeach; ?>
 				</nav>
 			<?php endif; ?>
 		</div>
-		<nav class="footer-navigation" aria-label="<?php esc_attr_e( 'Footer navigation', 'calmpress' ); ?>">
+		<?php if ( calmpress_get_option( 'calmpress_show_footer_menu' ) ) : ?>
+		<nav class="footer-navigation" aria-label="<?php esc_attr_e( 'Alt bilgi gezinmesi', 'calmpress' ); ?>">
 			<?php
 			wp_nav_menu(
 				array(
@@ -47,6 +49,7 @@
 			);
 			?>
 		</nav>
+		<?php endif; ?>
 	</div>
 </footer>
 <?php calmpress_render_ad( 'footer' ); ?>

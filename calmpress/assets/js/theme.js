@@ -20,8 +20,8 @@
 
 	var label = toggle.querySelector('.theme-toggle__label');
 	var config = window.calmpressTheme || {};
-	var labels = config.labels || { system: 'System', light: 'Light', dark: 'Dark' };
-	var activate = config.activate || 'Activate to change.';
+	var labels = config.labels || { system: 'Sistem', light: 'Açık', dark: 'Koyu' };
+	var activate = config.activate || 'Değiştirmek için etkinleştirin.';
 
 	function updateButton() {
 		toggle.setAttribute('aria-label', labels[theme] + '. ' + activate);

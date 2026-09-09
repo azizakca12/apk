@@ -13,12 +13,12 @@ get_header();
 		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 			<div class="app-hero">
 				<div>
-					<div class="entry-meta"><?php esc_html_e( 'Android application', 'calmpress' ); ?></div>
+					<div class="entry-meta"><?php esc_html_e( 'Android uygulaması', 'calmpress' ); ?></div>
 					<h1 class="entry-title"><?php the_title(); ?></h1>
 					<?php if ( has_excerpt() ) : ?><p class="entry-meta"><?php echo esc_html( get_the_excerpt() ); ?></p><?php endif; ?>
 					<?php $download_url = calmpress_app_detail( get_the_ID(), 'download_url' ); ?>
 					<?php if ( $download_url ) : ?>
-						<a class="button app-download" href="<?php echo esc_url( $download_url ); ?>" rel="nofollow sponsored"><?php esc_html_e( 'Download APK', 'calmpress' ); ?></a>
+						<a class="button app-download" href="<?php echo esc_url( $download_url ); ?>" rel="nofollow sponsored"><?php esc_html_e( 'APK indir', 'calmpress' ); ?></a>
 					<?php endif; ?>
 				</div>
 				<div>
@@ -29,10 +29,10 @@ get_header();
 				<dl class="app-details">
 					<?php
 					$app_fields = array(
-						'version'   => __( 'Version', 'calmpress' ),
-						'file_size' => __( 'File size', 'calmpress' ),
+						'version'   => __( 'Sürüm', 'calmpress' ),
+						'file_size' => __( 'Dosya boyutu', 'calmpress' ),
 						'platform'  => __( 'Platform', 'calmpress' ),
-						'developer' => __( 'Developer', 'calmpress' ),
+						'developer' => __( 'Geliştirici', 'calmpress' ),
 					);
 					foreach ( $app_fields as $key => $label ) :
 						$value = calmpress_app_detail( get_the_ID(), $key );
