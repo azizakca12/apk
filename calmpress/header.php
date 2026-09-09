@@ -46,6 +46,9 @@
 			);
 			?>
 		</nav>
+		<?php if ( calmpress_get_option( 'calmpress_modal_search' ) ) : ?>
+			<button type="button" class="search-toggle button--secondary" data-search-open aria-controls="calmpress-search-modal" aria-haspopup="dialog"><?php esc_html_e( 'Ara', 'calmpress' ); ?></button>
+		<?php endif; ?>
 		<button type="button" class="theme-toggle" aria-label="<?php esc_attr_e( 'Renk temasını değiştir', 'calmpress' ); ?>" data-theme-toggle>
 			<span aria-hidden="true">◐</span>
 			<span class="theme-toggle__label"><?php esc_html_e( 'Tema', 'calmpress' ); ?></span>
@@ -56,3 +59,13 @@
 	<?php endif; ?>
 </header>
 <?php calmpress_render_ad( 'header' ); ?>
+<?php if ( calmpress_get_option( 'calmpress_modal_search' ) ) : ?>
+	<div class="search-modal" id="calmpress-search-modal" data-search-modal hidden>
+		<div class="search-modal__overlay" data-search-close></div>
+		<section class="search-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="calmpress-search-title">
+			<button type="button" class="search-modal__close button--secondary" data-search-close aria-label="<?php esc_attr_e( 'Aramayı kapat', 'calmpress' ); ?>">×</button>
+			<h2 id="calmpress-search-title"><?php esc_html_e( 'Sitede ara', 'calmpress' ); ?></h2>
+			<?php get_search_form(); ?>
+		</section>
+	</div>
+<?php endif; ?>

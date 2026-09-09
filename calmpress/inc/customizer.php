@@ -110,6 +110,18 @@ function calmpress_customize_settings() {
 		'calmpress_footer_columns'           => array( 'default' => 2, 'sanitize' => 'calmpress_customize_footer_columns', 'transport' => 'refresh' ),
 		'calmpress_back_to_top'              => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
 		'calmpress_share_buttons'            => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_toc_enabled'              => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_related_enabled'          => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_related_count'            => array( 'default' => 3, 'sanitize' => 'absint', 'transport' => 'refresh' ),
+		'calmpress_author_box'               => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_popular_widget'           => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_popular_count'            => array( 'default' => 5, 'sanitize' => 'absint', 'transport' => 'refresh' ),
+		'calmpress_categories_widget'        => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_modal_search'             => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_mobile_nav'              => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_campaign_enabled'         => array( 'default' => 0, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_campaign_text'            => array( 'default' => 'Yeni yazıları keşfedin.', 'sanitize' => 'sanitize_text_field', 'transport' => 'refresh' ),
+		'calmpress_campaign_link'            => array( 'default' => '', 'sanitize' => 'esc_url_raw', 'transport' => 'refresh' ),
 		'calmpress_ads_enabled'              => array( 'default' => 0, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
 		'calmpress_high_contrast'            => array( 'default' => 0, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
 		'calmpress_focus_color'              => array( 'default' => '#356ae6', 'sanitize' => 'calmpress_sanitize_accent_color', 'transport' => 'postMessage' ),
@@ -270,6 +282,18 @@ function calmpress_customize_register( $wp_customize ) {
 	$control( 'calmpress_footer_columns', 'calmpress_footer', __( 'Alt bilgi sütunları', 'calmpress' ), __( '1–4 sütunluk düzen tercihi.', 'calmpress' ), 'number', array( 'input_attrs' => array( 'min' => 1, 'max' => 4 ) ) );
 	$checkbox( 'calmpress_back_to_top', 'calmpress_footer', __( 'Başa dön düğmesi', 'calmpress' ), __( 'Uzun sayfalarda erişilebilir bir hızlı dönüş düğmesi gösterir.', 'calmpress' ) );
 	$checkbox( 'calmpress_share_buttons', 'calmpress_footer', __( 'Paylaş düğmelerini göster', 'calmpress' ), __( 'Yazılarda Web Share ve kopyalama yedeği sunar.', 'calmpress' ) );
+	$checkbox( 'calmpress_toc_enabled', 'calmpress_content', __( 'İçindekiler tablosunu göster', 'calmpress' ), __( 'Yazı ve sayfalardaki H2/H3 başlıklarından erişilebilir bir liste oluşturur.', 'calmpress' ) );
+	$checkbox( 'calmpress_related_enabled', 'calmpress_content', __( 'İlgili yazıları göster', 'calmpress' ), __( 'İçerik içinde ve yazının sonunda benzer kategori/etiketleri gösterir.', 'calmpress' ) );
+	$control( 'calmpress_related_count', 'calmpress_content', __( 'İlgili yazı sayısı', 'calmpress' ), __( 'Yazı sonunda gösterilecek kart sayısı (1–6).', 'calmpress' ), 'number', array( 'input_attrs' => array( 'min' => 1, 'max' => 6 ) ) );
+	$checkbox( 'calmpress_author_box', 'calmpress_content', __( 'Yazar kutusunu göster', 'calmpress' ), __( 'Yazının altında avatar, biyografi ve yazar bağlantısı gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_popular_widget', 'calmpress_content', __( 'Çok okunanlar bölümünü göster', 'calmpress' ), __( 'Kenar çubuğunda yorum sayısına göre popüler yazıları listeler.', 'calmpress' ) );
+	$control( 'calmpress_popular_count', 'calmpress_content', __( 'Çok okunanlar sayısı', 'calmpress' ), __( 'Kenar çubuğunda gösterilecek yazı sayısı (1–10).', 'calmpress' ), 'number', array( 'input_attrs' => array( 'min' => 1, 'max' => 10 ) ) );
+	$checkbox( 'calmpress_categories_widget', 'calmpress_content', __( 'CalmPress kategorilerini göster', 'calmpress' ), __( 'Kenar çubuğunda özel kategori bölümünü gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_modal_search', 'calmpress_header', __( 'Açılır aramayı göster', 'calmpress' ), __( 'Başlıkta klavye odaklı arama penceresi açan düğmeyi gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_mobile_nav', 'calmpress_footer', __( 'Mobil alt gezinmeyi göster', 'calmpress' ), __( 'Küçük ekranlarda menü, ana sayfa ve arama kısayolları sunar.', 'calmpress' ) );
+	$checkbox( 'calmpress_campaign_enabled', 'calmpress_footer', __( 'Alt kampanya bildirimini göster', 'calmpress' ), __( 'Kapatma tercihini cihazda saklayan sakin bir bildirim bandı.', 'calmpress' ) );
+	$control( 'calmpress_campaign_text', 'calmpress_footer', __( 'Kampanya metni', 'calmpress' ), __( 'Bildirimde görünecek kısa Türkçe metin.', 'calmpress' ) );
+	$control( 'calmpress_campaign_link', 'calmpress_footer', __( 'Kampanya bağlantısı', 'calmpress' ), __( 'İsteğe bağlı güvenli bağlantı.', 'calmpress' ), 'url' );
 	foreach ( array( 'facebook' => 'Facebook', 'instagram' => 'Instagram', 'x' => 'X', 'youtube' => 'YouTube', 'github' => 'GitHub' ) as $network => $label ) {
 		$control( 'calmpress_social_' . $network, 'calmpress_footer', $label, __( 'Alt bilgide gösterilecek profil URL’si.', 'calmpress' ), 'url' );
 	}

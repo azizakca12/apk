@@ -71,6 +71,8 @@ function calmpress_widgets_init() {
 		);
 	}
 	register_widget( 'CalmPress_Recent_Apps_Widget' );
+	register_widget( 'CalmPress_Popular_Posts_Widget' );
+	register_widget( 'CalmPress_Categories_Widget' );
 }
 add_action( 'widgets_init', 'calmpress_widgets_init' );
 
@@ -87,12 +89,345 @@ function calmpress_hide_content_categories_widget( $instance, $widget, $args ) {
 		return $instance;
 	}
 	$content = isset( $instance['content'] ) ? (string) $instance['content'] : '';
-	if ( false !== strpos( $content, '"core/categories"' ) ) {
+	if ( false !== strpos( $content, '"core/categories"' ) || false !== strpos( $content, 'wp:categories' ) ) {
 		return false;
 	}
 	return $instance;
 }
 add_filter( 'widget_display_callback', 'calmpress_hide_content_categories_widget', 10, 3 );
+
+/**
+ * Return whether enhanced singular content can be processed.
+ *
+ * @return bool
+ */
+function calmpress_is_enhanced_content() {
+	return ! is_admin() && ! is_feed() && ! is_embed() && in_the_loop() && is_main_query() && is_singular( array( 'post', 'page' ) ) && 'app' !== get_post_type();
+}
+
+/**
+ * Build a stable, unique heading id.
+ *
+ * @param string   $text Heading text.
+ * @param string[] $used IDs already used in the document.
+ * @param int      $index Heading index.
+ * @return string
+ */
+function calmpress_heading_id( $text, &$used, $index ) {
+	$id = sanitize_title( wp_strip_all_tags( $text ) );
+	if ( '' === $id ) {
+		$id = 'baslik-' . absint( $index );
+	}
+	$base = $id;
+	$suffix = 2;
+	while ( in_array( $id, $used, true ) ) {
+		$id = $base . '-' . $suffix;
+		++$suffix;
+	}
+	$used[] = $id;
+	return $id;
+}
+
+/**
+ * Render a compact accessible table of contents.
+ *
+ * @param array $items Heading data.
+ * @return string
+ */
+function calmpress_render_toc( $items ) {
+	if ( empty( $items ) ) {
+		return '';
+	}
+	$output = '<nav class="calmpress-toc" aria-labelledby="calmpress-toc-title" data-toc><details open><summary id="calmpress-toc-title">' . esc_html__( 'İçindekiler', 'calmpress' ) . '</summary><ol>';
+	foreach ( $items as $item ) {
+		$output .= '<li class="calmpress-toc__level-' . absint( $item['level'] ) . '"><a href="#' . esc_attr( $item['id'] ) . '">' . esc_html( $item['text'] ) . '</a></li>';
+	}
+	return $output . '</ol></details></nav>';
+}
+
+/**
+ * Add ids to H2/H3 elements and prepend a table of contents.
+ *
+ * DOMDocument is used where available so links, code and nested markup are
+ * preserved. The small fallback only replaces heading tags and never parses
+ * arbitrary HTML.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function calmpress_add_table_of_contents( $content ) {
+	static $processed = array();
+	if ( ! calmpress_is_enhanced_content() || ! calmpress_get_option( 'calmpress_toc_enabled' ) || false !== strpos( $content, 'data-toc' ) ) {
+		return $content;
+	}
+	$post_id = get_the_ID();
+	if ( isset( $processed[ $post_id ] ) ) {
+		return $content;
+	}
+	$processed[ $post_id ] = true;
+	$items = array();
+	$used  = array();
+	if ( class_exists( 'DOMDocument' ) ) {
+		$dom = new DOMDocument( '1.0', 'UTF-8' );
+		$flags = defined( 'LIBXML_HTML_NOIMPLIED' ) ? LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING : LIBXML_NOERROR | LIBXML_NOWARNING;
+		if ( @$dom->loadHTML( '<?xml encoding="UTF-8"><div id="calmpress-content-root">' . $content . '</div>', $flags ) ) {
+			$root = $dom->getElementById( 'calmpress-content-root' );
+			if ( ! $root ) {
+				foreach ( $dom->getElementsByTagName( 'div' ) as $candidate ) {
+					if ( 'calmpress-content-root' === $candidate->getAttribute( 'id' ) ) {
+						$root = $candidate;
+						break;
+					}
+				}
+			}
+			if ( $root ) {
+				$index = 0;
+				$xpath = new DOMXPath( $dom );
+				foreach ( $xpath->query( './/h2 | .//h3', $root ) as $heading ) {
+						$tag = strtolower( $heading->tagName );
+						$text = trim( preg_replace( '/\s+/u', ' ', $heading->textContent ) );
+						if ( '' === $text ) {
+							continue;
+						}
+						$id = sanitize_title( $heading->getAttribute( 'id' ) );
+						if ( '' === $id || in_array( $id, $used, true ) ) {
+							$id = calmpress_heading_id( $text, $used, ++$index );
+							$heading->setAttribute( 'id', $id );
+						} else {
+							$heading->setAttribute( 'id', $id );
+							$used[] = $id;
+							++$index;
+						}
+						$items[] = array( 'id' => $id, 'text' => $text, 'level' => 2 === (int) substr( $tag, 1 ) ? 2 : 3 );
+				}
+				if ( ! empty( $items ) ) {
+					$updated = '';
+					foreach ( $root->childNodes as $child ) {
+						$updated .= $dom->saveHTML( $child );
+					}
+					return calmpress_render_toc( $items ) . $updated;
+				}
+			}
+		}
+	}
+	$index = 0;
+	$fallback = preg_replace_callback(
+		'/<h([23])(\s[^>]*)?>(.*?)<\/h\1>/is',
+		function ( $match ) use ( &$items, &$used, &$index ) {
+			$text = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $match[3] ) ) );
+			if ( '' === $text ) {
+				return $match[0];
+			}
+			$attributes = (string) $match[2];
+			if ( preg_match( '/\bid\s*=\s*["\']([^"\']+)["\']/i', $attributes, $id_match ) && '' !== sanitize_title( $id_match[1] ) && ! in_array( $id_match[1], $used, true ) ) {
+				$id = sanitize_title( $id_match[1] );
+				$attributes = preg_replace( '/\bid\s*=\s*["\'][^"\']+["\']/i', 'id="' . esc_attr( $id ) . '"', $attributes, 1 );
+				$used[] = $id;
+			} else {
+				$id = calmpress_heading_id( $text, $used, ++$index );
+				$attributes .= ' id="' . esc_attr( $id ) . '"';
+			}
+			$items[] = array( 'id' => $id, 'text' => $text, 'level' => absint( $match[1] ) );
+			return '<h' . $match[1] . $attributes . '>' . $match[3] . '</h' . $match[1] . '>';
+		},
+		$content
+	);
+	return ! empty( $items ) ? calmpress_render_toc( $items ) . $fallback : $content;
+}
+add_filter( 'the_content', 'calmpress_add_table_of_contents', 20 );
+
+/**
+ * Find a related post using shared categories and tags.
+ *
+ * @param int $post_id Current post.
+ * @param int $limit Number of posts.
+ * @return WP_Query
+ */
+function calmpress_related_query( $post_id, $limit = 3 ) {
+	$tax_query = array( 'relation' => 'OR' );
+	$categories = wp_get_post_categories( $post_id );
+	$tags = wp_get_post_tags( $post_id, array( 'fields' => 'ids' ) );
+	if ( $categories ) {
+		$tax_query[] = array( 'taxonomy' => 'category', 'field' => 'term_id', 'terms' => $categories );
+	}
+	if ( $tags ) {
+		$tax_query[] = array( 'taxonomy' => 'post_tag', 'field' => 'term_id', 'terms' => $tags );
+	}
+	if ( count( $tax_query ) < 2 ) {
+		return new WP_Query( array( 'post__in' => array( 0 ), 'no_found_rows' => true ) );
+	}
+	return new WP_Query(
+		array(
+			'post_type' => 'post',
+			'post__not_in' => array( $post_id ),
+			'posts_per_page' => min( 6, max( 1, absint( $limit ) ) ),
+			'tax_query' => $tax_query,
+			'orderby' => 'date',
+			'no_found_rows' => true,
+			'cache_results' => true,
+			'ignore_sticky_posts' => true,
+		)
+	);
+}
+
+/**
+ * Add one related-post card after the third paragraph.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function calmpress_insert_in_content_related( $content ) {
+	static $processed = array();
+	if ( ! calmpress_is_enhanced_content() || ! calmpress_get_option( 'calmpress_related_enabled' ) || false !== strpos( $content, 'data-related-inline' ) ) {
+		return $content;
+	}
+	$post_id = get_the_ID();
+	if ( isset( $processed[ $post_id ] ) ) {
+		return $content;
+	}
+	$processed[ $post_id ] = true;
+	$query = calmpress_related_query( $post_id, 1 );
+	if ( ! $query->have_posts() ) {
+		wp_reset_postdata();
+		return $content;
+	}
+	$query->the_post();
+	$card = '<aside class="related-inline" data-related-inline><strong>' . esc_html__( 'Ayrıca okuyun', 'calmpress' ) . '</strong><a href="' . esc_url( get_permalink() ) . '">' . esc_html( get_the_title() ) . '</a></aside>';
+	wp_reset_postdata();
+	if ( class_exists( 'DOMDocument' ) ) {
+		$dom = new DOMDocument( '1.0', 'UTF-8' );
+		$flags = defined( 'LIBXML_HTML_NOIMPLIED' ) ? LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING : LIBXML_NOERROR | LIBXML_NOWARNING;
+		if ( @$dom->loadHTML( '<?xml encoding="UTF-8"><div id="cp-related-root">' . $content . '</div>', $flags ) ) {
+			$root = $dom->getElementById( 'cp-related-root' );
+			if ( ! $root ) {
+				foreach ( $dom->getElementsByTagName( 'div' ) as $candidate ) {
+					if ( 'cp-related-root' === $candidate->getAttribute( 'id' ) ) {
+						$root = $candidate;
+						break;
+					}
+				}
+			}
+			if ( $root ) {
+				$paragraphs = $root->getElementsByTagName( 'p' );
+				if ( $paragraphs->length >= 3 ) {
+					$fragment_dom = new DOMDocument( '1.0', 'UTF-8' );
+					@$fragment_dom->loadHTML( '<?xml encoding="UTF-8">' . $card, $flags );
+					$node = $fragment_dom->getElementsByTagName( 'aside' )->item( 0 );
+					if ( $node ) {
+						$imported = $dom->importNode( $node, true );
+						$target = $paragraphs->item( 2 );
+						$target->parentNode->insertBefore( $imported, $target->nextSibling );
+						$updated = '';
+						foreach ( $root->childNodes as $child ) {
+							$updated .= $dom->saveHTML( $child );
+						}
+						return $updated;
+					}
+				}
+			}
+		}
+	}
+	$count = 0;
+	return preg_replace_callback( '/(<p\b[^>]*>.*?<\/p>)/is', function ( $match ) use ( &$count, $card ) {
+		++$count;
+		return 3 === $count ? $match[1] . $card : $match[1];
+	}, $content );
+}
+add_filter( 'the_content', 'calmpress_insert_in_content_related', 21 );
+
+/**
+ * Render reusable share controls.
+ *
+ * @param string $position Placement label.
+ * @return void
+ */
+function calmpress_render_share_tools( $position = '' ) {
+	$label = __( 'Bu yazıyı paylaş', 'calmpress' );
+	$id = 'calmpress-share-' . sanitize_html_class( $position ? $position : 'content' );
+	printf( '<div id="%1$s" class="share-tools share-tools--%2$s" data-share-title="%3$s" data-share-url="%4$s"><strong>%5$s</strong><button type="button" class="button button--secondary" data-share-native aria-label="%6$s">%7$s</button><button type="button" class="button button--secondary" data-share-copy aria-label="%8$s">%9$s</button><span class="screen-reader-text" data-share-status aria-live="polite"></span></div>', esc_attr( $id ), esc_attr( $position ? $position : 'content' ), esc_attr( get_the_title() ), esc_url( get_permalink() ), esc_html( $label ), esc_attr__( 'Sistem paylaşımını aç', 'calmpress' ), esc_html__( 'Paylaş', 'calmpress' ), esc_attr__( 'Bağlantıyı kopyala', 'calmpress' ), esc_html__( 'Bağlantıyı kopyala', 'calmpress' ) );
+}
+
+/**
+ * Render tags for the current post.
+ *
+ * @return void
+ */
+function calmpress_render_post_tags() {
+	if ( ! has_tag() ) {
+		return;
+	}
+	echo '<div class="post-tags"><strong>' . esc_html__( 'Etiketler', 'calmpress' ) . '</strong><ul>';
+	foreach ( get_the_tags() as $tag ) {
+		printf( '<li><a href="%1$s">#%2$s</a></li>', esc_url( get_tag_link( $tag ) ), esc_html( $tag->name ) );
+	}
+	echo '</ul></div>';
+}
+
+/**
+ * Render the author information card.
+ *
+ * @return void
+ */
+function calmpress_render_author_box() {
+	if ( ! calmpress_get_option( 'calmpress_author_box' ) ) {
+		return;
+	}
+	$author_id = get_the_author_meta( 'ID' );
+	printf( '<section class="author-box" aria-labelledby="author-box-title">%1$s<div><h2 id="author-box-title">%2$s</h2><p class="author-box__name"><a href="%3$s">%4$s</a></p>%5$s</div></section>', get_avatar( $author_id, 80, '', get_the_author(), array( 'class' => array( 'author-box__avatar' ) ) ), esc_html__( 'Yazar', 'calmpress' ), esc_url( get_author_posts_url( $author_id ) ), esc_html( get_the_author() ), wpautop( esc_html( get_the_author_meta( 'description', $author_id ) ) ) );
+}
+
+/**
+ * Render related cards below a singular article.
+ *
+ * @return void
+ */
+function calmpress_render_related_posts() {
+	if ( ! calmpress_is_enhanced_content() || ! calmpress_get_option( 'calmpress_related_enabled' ) ) {
+		return;
+	}
+	$query = calmpress_related_query( get_the_ID(), min( 6, max( 1, absint( calmpress_get_option( 'calmpress_related_count' ) ) ) ) );
+	if ( ! $query->have_posts() ) {
+		wp_reset_postdata();
+		return;
+	}
+	echo '<section class="related-posts" aria-labelledby="related-posts-title"><h2 id="related-posts-title">' . esc_html__( 'Bunlar da ilginizi çekebilir', 'calmpress' ) . '</h2><div class="related-posts__grid">';
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		get_template_part( 'template-parts/content', 'post' );
+	}
+	echo '</div></section>';
+	wp_reset_postdata();
+}
+
+/**
+ * Render the lightweight built-in sidebar sections.
+ *
+ * @return void
+ */
+function calmpress_render_builtin_sidebar() {
+	if ( calmpress_get_option( 'calmpress_popular_widget' ) ) {
+		$query = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => min( 10, max( 1, absint( calmpress_get_option( 'calmpress_popular_count' ) ) ) ), 'orderby' => 'comment_count', 'order' => 'DESC', 'no_found_rows' => true, 'cache_results' => true, 'ignore_sticky_posts' => true ) );
+		if ( $query->have_posts() ) {
+			echo '<section class="widget calmpress-popular-widget"><h2 class="widget-title">' . esc_html__( 'Çok okunanlar', 'calmpress' ) . '</h2><ol>';
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				printf( '<li><a href="%1$s">%2$s</a><span>%3$s</span></li>', esc_url( get_permalink() ), esc_html( get_the_title() ), esc_html( sprintf( _n( '%s yorum', '%s yorum', get_comments_number(), 'calmpress' ), number_format_i18n( get_comments_number() ) ) ) );
+			}
+			echo '</ol></section>';
+		}
+		wp_reset_postdata();
+	}
+	if ( calmpress_get_option( 'calmpress_categories_widget' ) && ! is_singular( array( 'post', 'page' ) ) ) {
+		$categories = get_categories( array( 'hide_empty' => true, 'number' => 12 ) );
+		if ( $categories ) {
+			echo '<section class="widget calmpress-categories-widget"><h2 class="widget-title">' . esc_html__( 'Kategoriler', 'calmpress' ) . '</h2><ul>';
+			foreach ( $categories as $category ) {
+				printf( '<li><a href="%1$s">%2$s</a><span>%3$s</span></li>', esc_url( get_category_link( $category ) ), esc_html( $category->name ), absint( $category->count ) );
+			}
+			echo '</ul></section>';
+		}
+	}
+}
 
 /**
  * Enqueue the small, dependency-free front-end assets.
@@ -118,6 +453,9 @@ function calmpress_enqueue_assets() {
 			'defaultTheme' => calmpress_get_option( 'calmpress_theme_default' ),
 			'shareCopied' => __( 'Bağlantı kopyalandı.', 'calmpress' ),
 			'sharePrompt' => __( 'Bağlantıyı kopyalayın:', 'calmpress' ),
+			'shareOpened' => __( 'Paylaşım penceresi açıldı.', 'calmpress' ),
+			'searchClose' => __( 'Aramayı kapat', 'calmpress' ),
+			'searchStatus' => __( 'Arama penceresi açıldı.', 'calmpress' ),
 		)
 	);
 	wp_script_add_data( 'calmpress-theme', 'strategy', 'defer' );
@@ -625,5 +963,71 @@ class CalmPress_Recent_Apps_Widget extends WP_Widget {
 	 */
 	public function update( $new_instance, $old_instance ) {
 		return array( 'title' => isset( $new_instance['title'] ) ? sanitize_text_field( $new_instance['title'] ) : '' );
+	}
+}
+
+/**
+ * A comment-count based popular posts widget with no plugin dependency.
+ */
+class CalmPress_Popular_Posts_Widget extends WP_Widget {
+	public function __construct() {
+		parent::__construct( 'calmpress_popular_posts', __( 'CalmPress: Çok okunanlar', 'calmpress' ), array( 'description' => __( 'Yazıları yorum sayısına göre listeler.', 'calmpress' ) ) );
+	}
+
+	public function widget( $args, $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Çok okunanlar', 'calmpress' );
+		$count = ! empty( $instance['count'] ) ? min( 10, max( 1, absint( $instance['count'] ) ) ) : 5;
+		$query = new WP_Query( array( 'post_type' => 'post', 'posts_per_page' => $count, 'orderby' => 'comment_count', 'order' => 'DESC', 'no_found_rows' => true, 'cache_results' => true, 'ignore_sticky_posts' => true ) );
+		if ( ! $query->have_posts() ) {
+			return;
+		}
+		echo $args['before_widget'] . $args['before_title'] . esc_html( $title ) . $args['after_title'] . '<ol>';
+		while ( $query->have_posts() ) {
+			$query->the_post();
+			printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( get_permalink() ), esc_html( get_the_title() ) );
+		}
+		echo '</ol>' . $args['after_widget'];
+		wp_reset_postdata();
+	}
+
+	public function form( $instance ) {
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Çok okunanlar', 'calmpress' );
+		$count = isset( $instance['count'] ) ? absint( $instance['count'] ) : 5;
+		printf( '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s"></p><p><label for="%5$s">%6$s</label><input class="small-text" id="%5$s" name="%7$s" type="number" min="1" max="10" value="%8$d"></p>', esc_attr( $this->get_field_id( 'title' ) ), esc_html__( 'Başlık:', 'calmpress' ), esc_attr( $this->get_field_name( 'title' ) ), esc_attr( $title ), esc_attr( $this->get_field_id( 'count' ) ), esc_html__( 'Sayı:', 'calmpress' ), esc_attr( $this->get_field_name( 'count' ) ), $count );
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		return array( 'title' => sanitize_text_field( $new_instance['title'] ?? '' ), 'count' => min( 10, max( 1, absint( $new_instance['count'] ?? 5 ) ) ) );
+	}
+}
+
+/**
+ * A dedicated category widget, separate from the generic core block.
+ */
+class CalmPress_Categories_Widget extends WP_Widget {
+	public function __construct() {
+		parent::__construct( 'calmpress_categories', __( 'CalmPress: Kategoriler', 'calmpress' ), array( 'description' => __( 'Yazı kategorilerini CalmPress görünümüyle gösterir.', 'calmpress' ) ) );
+	}
+
+	public function widget( $args, $instance ) {
+		$title = ! empty( $instance['title'] ) ? $instance['title'] : __( 'Kategoriler', 'calmpress' );
+		$categories = get_categories( array( 'hide_empty' => true, 'number' => 12 ) );
+		if ( ! $categories ) {
+			return;
+		}
+		echo $args['before_widget'] . $args['before_title'] . esc_html( $title ) . $args['after_title'] . '<ul>';
+		foreach ( $categories as $category ) {
+			printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( get_category_link( $category ) ), esc_html( $category->name ) );
+		}
+		echo '</ul>' . $args['after_widget'];
+	}
+
+	public function form( $instance ) {
+		$title = isset( $instance['title'] ) ? $instance['title'] : __( 'Kategoriler', 'calmpress' );
+		printf( '<p><label for="%1$s">%2$s</label><input class="widefat" id="%1$s" name="%3$s" type="text" value="%4$s"></p>', esc_attr( $this->get_field_id( 'title' ) ), esc_html__( 'Başlık:', 'calmpress' ), esc_attr( $this->get_field_name( 'title' ) ), esc_attr( $title ) );
+	}
+
+	public function update( $new_instance, $old_instance ) {
+		return array( 'title' => sanitize_text_field( $new_instance['title'] ?? '' ) );
 	}
 }

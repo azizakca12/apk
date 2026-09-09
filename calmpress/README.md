@@ -38,6 +38,12 @@ for `/apps/`, visit **Settings → Permalinks** and press **Save Changes**.
   breadcrumbs-ready semantic structure, and Article/SoftwareApplication JSON-LD
 - Secure app metadata editing with capability checks, sanitization, and a
   nonce
+- Accessible H2/H3 table of contents with stable heading links, in-content
+  “Ayrıca okuyun” cards, tag links, author cards, and related-post cards
+- Reusable share controls (Web Share with clipboard fallback) above and below
+  singular content, plus a comment-count popular-posts sidebar
+- Focus-trapped category search modal, responsive mobile navigation, and an
+  optional dismissible campaign notification stored in local storage
 - No external fonts, trackers, build step, or heavy JavaScript dependencies
 
 ## Customization
@@ -49,9 +55,13 @@ content width, card density, corner radius, system/readable font stacks,
 default color mode, reduced motion, sticky header, announcement styles,
 navigation treatments, homepage hero and section visibility, archive copy,
 excerpt length, app facts and download labels, footer layout, social links,
-share buttons, back-to-top navigation, contrast, image loading, embeds,
-emoji, Dashicons, and ad placement visibility. Child themes can override any
-template or enqueue additional styles.
+share buttons, table of contents, related posts, author cards, popular posts,
+categories, modal search, mobile navigation, campaign text/link, back-to-top
+navigation, contrast, image loading, embeds, emoji, Dashicons, and ad
+placement visibility. Child themes can override any template or enqueue
+additional styles. The generic core Categories block remains hidden on
+singular content; use the dedicated CalmPress categories widget or the
+CalmPress Studio option instead.
 
 The optional Custom CSS field accepts a bounded, CSS-only snippet. It strips
 HTML, script-like CSS constructs, and style tags before output. Do not paste

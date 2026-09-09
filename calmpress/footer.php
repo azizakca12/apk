@@ -53,6 +53,19 @@
 	</div>
 </footer>
 <?php calmpress_render_ad( 'footer' ); ?>
+<?php if ( calmpress_get_option( 'calmpress_mobile_nav' ) ) : ?>
+	<nav class="mobile-bottom-nav" aria-label="<?php esc_attr_e( 'Mobil gezinme', 'calmpress' ); ?>">
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><span aria-hidden="true">⌂</span><?php esc_html_e( 'Ana sayfa', 'calmpress' ); ?></a>
+		<?php if ( has_nav_menu( 'primary' ) ) : ?><button type="button" data-mobile-menu aria-expanded="false"><span aria-hidden="true">☰</span><?php esc_html_e( 'Menü', 'calmpress' ); ?></button><?php endif; ?>
+		<?php if ( calmpress_get_option( 'calmpress_modal_search' ) ) : ?><button type="button" data-search-open aria-controls="calmpress-search-modal"><span aria-hidden="true">⌕</span><?php esc_html_e( 'Ara', 'calmpress' ); ?></button><?php endif; ?>
+	</nav>
+<?php endif; ?>
+<?php if ( calmpress_get_option( 'calmpress_campaign_enabled' ) && calmpress_get_option( 'calmpress_campaign_text' ) ) : ?>
+	<div class="campaign-notice" data-campaign data-campaign-key="<?php echo esc_attr( md5( calmpress_get_option( 'calmpress_campaign_text' ) . calmpress_get_option( 'calmpress_campaign_link' ) ) ); ?>">
+		<?php if ( calmpress_get_option( 'calmpress_campaign_link' ) ) : ?><a href="<?php echo esc_url( calmpress_get_option( 'calmpress_campaign_link' ) ); ?>"><?php echo esc_html( calmpress_get_option( 'calmpress_campaign_text' ) ); ?></a><?php else : ?><span><?php echo esc_html( calmpress_get_option( 'calmpress_campaign_text' ) ); ?></span><?php endif; ?>
+		<button type="button" data-campaign-dismiss aria-label="<?php esc_attr_e( 'Bildirimi kapat', 'calmpress' ); ?>">×</button>
+	</div>
+<?php endif; ?>
 <?php if ( calmpress_get_option( 'calmpress_back_to_top' ) ) : ?>
 	<button type="button" class="back-to-top" data-back-to-top aria-label="<?php esc_attr_e( 'Sayfanın başına dön', 'calmpress' ); ?>"><span aria-hidden="true">↑</span><span class="screen-reader-text"><?php esc_html_e( 'Başa dön', 'calmpress' ); ?></span></button>
 <?php endif; ?>
