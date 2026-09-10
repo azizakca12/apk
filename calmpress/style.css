@@ -301,6 +301,80 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 .entry-content { font-size: 1.06rem; }
 .entry-content h2 { margin-top: 2.2em; }
 .entry-content h3 { margin-top: 1.8em; }
+.entry-content ul,
+.entry-content ol { padding-left: 1.5rem; }
+.entry-content li + li { margin-top: .35rem; }
+.entry-content li > a {
+	display: inline-flex;
+	align-items: center;
+	gap: .8rem;
+	color: var(--cp-accent);
+	font-weight: 650;
+	text-decoration: none;
+	transition: color .18s ease, transform .18s ease;
+}
+.entry-content li > a::before {
+	content: "";
+	display: inline-block;
+	width: .55rem;
+	height: .55rem;
+	flex: 0 0 .55rem;
+	border-radius: 50%;
+	background: var(--cp-accent);
+	box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--cp-accent) 18%, transparent);
+}
+.entry-content li > a:hover,
+.entry-content li > a:focus-visible {
+	color: var(--cp-accent-hover);
+	transform: translateX(.08rem);
+}
+.entry-content ul.docs-index,
+.entry-content ul.doc-links,
+.entry-content ul.page-links {
+	margin: 2.25rem 0 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--cp-border);
+}
+.entry-content ul.docs-index li,
+.entry-content ul.doc-links li,
+.entry-content ul.page-links li {
+	border-bottom: 1px solid var(--cp-border);
+}
+.entry-content ul.docs-index a,
+.entry-content ul.doc-links a,
+.entry-content ul.page-links a {
+	display: flex;
+	align-items: center;
+	gap: .9rem;
+	padding: 1.05rem 0;
+	color: var(--cp-accent);
+	font-size: clamp(1.3rem, 2.4vw, 2rem);
+	line-height: 1.3;
+	letter-spacing: -.03em;
+	font-weight: 700;
+	text-decoration: none;
+}
+.entry-content ul.docs-index a::before,
+.entry-content ul.doc-links a::before,
+.entry-content ul.page-links a::before {
+	content: "";
+	display: inline-block;
+	width: .7rem;
+	height: .7rem;
+	flex: 0 0 .7rem;
+	border-radius: 50%;
+	background: var(--cp-text);
+	box-shadow: 0 0 0 .22rem color-mix(in srgb, var(--cp-accent) 14%, transparent);
+}
+.entry-content ul.docs-index a:hover,
+.entry-content ul.doc-links a:hover,
+.entry-content ul.page-links a:hover,
+.entry-content ul.docs-index a:focus-visible,
+.entry-content ul.doc-links a:focus-visible,
+.entry-content ul.page-links a:focus-visible {
+	color: var(--cp-accent-hover);
+}
 .entry-content blockquote { margin-inline: 0; padding: 1rem 1.25rem; border-left: 4px solid var(--cp-accent); background: var(--cp-surface-muted); }
 .entry-content pre { overflow: auto; padding: 1rem; border-radius: var(--cp-radius-small); background: #111827; color: #e5e7eb; }
 .entry-content table { width: 100%; border-collapse: collapse; }
