@@ -1,0 +1,127 @@
+:root {
+	--cp-admin-bg: #f4f6fa;
+	--cp-admin-surface: #fff;
+	--cp-admin-muted: #667085;
+	--cp-admin-text: #152033;
+	--cp-admin-border: #dfe5ee;
+	--cp-admin-accent: #356ae6;
+	--cp-admin-shadow: 0 18px 48px rgba(30, 48, 81, .08);
+}
+.calmpress-admin {
+	max-width: 1320px;
+	margin: 24px 20px 48px 0;
+	color: var(--cp-admin-text);
+}
+.calmpress-admin *,
+.calmpress-admin *::before,
+.calmpress-admin *::after { box-sizing: border-box; }
+.calmpress-admin__hero {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 24px;
+	padding: clamp(24px, 4vw, 48px);
+	border: 1px solid var(--cp-admin-border);
+	border-radius: 24px;
+	background: radial-gradient(circle at 100% 0, #e4ecff, transparent 48%), var(--cp-admin-surface);
+	box-shadow: var(--cp-admin-shadow);
+}
+.calmpress-admin__eyebrow,
+.calmpress-admin__kicker {
+	margin: 0 0 8px;
+	color: var(--cp-admin-accent);
+	font-size: 11px;
+	font-weight: 800;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+}
+.calmpress-admin h1,
+.calmpress-admin h2,
+.calmpress-admin h3 { color: var(--cp-admin-text); letter-spacing: -.035em; }
+.calmpress-admin h1 { margin: 0; font-size: clamp(28px, 4vw, 48px); line-height: 1.05; }
+.calmpress-admin h2 { margin: 3px 0 8px; font-size: clamp(20px, 2.3vw, 29px); }
+.calmpress-admin h3 { margin: 0; font-size: 16px; }
+.calmpress-admin__lead { max-width: 680px; margin: 14px 0 0; color: var(--cp-admin-muted); font-size: 15px; }
+.calmpress-admin__hero-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.calmpress-admin__status { display: inline-flex; align-items: center; gap: 7px; color: #176b48; font-size: 13px; font-weight: 700; }
+.calmpress-admin__status span { width: 9px; height: 9px; border-radius: 50%; background: #2db979; box-shadow: 0 0 0 4px #ddf6e9; }
+.calmpress-admin .button-hero { min-height: 42px; padding: 8px 18px; border: 0; border-radius: 12px; background: var(--cp-admin-accent); box-shadow: 0 8px 20px rgba(53, 106, 230, .2); }
+.calmpress-admin__layout { display: grid; grid-template-columns: 224px minmax(0, 1fr); gap: 24px; margin-top: 24px; }
+.calmpress-admin__sidebar { align-self: start; position: sticky; top: 44px; padding: 12px; border: 1px solid var(--cp-admin-border); border-radius: 18px; background: var(--cp-admin-surface); box-shadow: var(--cp-admin-shadow); }
+.calmpress-admin__sidebar nav { display: grid; gap: 3px; }
+.calmpress-admin__sidebar a { display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 11px; color: #536176; font-size: 13px; font-weight: 650; text-decoration: none; }
+.calmpress-admin__sidebar a:hover { background: #f0f4fc; color: var(--cp-admin-accent); }
+.calmpress-admin__sidebar a.is-active { background: #eaf0ff; color: #244ea9; }
+.calmpress-admin__sidebar .dashicons { width: 18px; height: 18px; font-size: 18px; }
+.calmpress-admin__main { min-width: 0; }
+.calmpress-admin__card { margin-bottom: 18px; padding: clamp(20px, 3vw, 32px); border: 1px solid var(--cp-admin-border); border-radius: 20px; background: var(--cp-admin-surface); box-shadow: var(--cp-admin-shadow); }
+.calmpress-admin__card-head { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 25px; }
+.calmpress-admin__card-head > p { max-width: 300px; margin: 8px 0 0; color: var(--cp-admin-muted); font-size: 13px; }
+.calmpress-admin__grid { display: grid; gap: 20px; }
+.calmpress-admin__grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.calmpress-admin__field { min-width: 0; }
+.calmpress-admin__field > label:first-child { display: block; margin-bottom: 8px; color: #354154; font-size: 13px; }
+.calmpress-admin__field input[type="text"],
+.calmpress-admin__field input[type="url"],
+.calmpress-admin__field input[type="number"],
+.calmpress-admin__field textarea,
+.calmpress-admin__field select { width: 100%; max-width: none; min-height: 42px; border: 1px solid #cbd4e1; border-radius: 10px; color: var(--cp-admin-text); background: #fbfcfe; box-shadow: none; }
+.calmpress-admin__field textarea { min-height: 112px; resize: vertical; }
+.calmpress-admin__field input:focus,
+.calmpress-admin__field textarea:focus,
+.calmpress-admin__field select:focus { border-color: var(--cp-admin-accent); box-shadow: 0 0 0 3px rgba(53, 106, 230, .17); outline: none; }
+.calmpress-admin__field input[type="color"] { width: 52px; height: 42px; padding: 3px; border: 1px solid #cbd4e1; border-radius: 10px; vertical-align: middle; }
+.calmpress-admin__swatch { display: inline-block; width: 26px; height: 26px; margin-left: 8px; border: 1px solid rgba(0,0,0,.08); border-radius: 50%; vertical-align: middle; box-shadow: inset 0 0 0 2px #fff; }
+.calmpress-admin .description { margin: 7px 0 0; color: var(--cp-admin-muted); font-size: 12px; line-height: 1.5; }
+.calmpress-admin__count { display: block; margin-top: 6px; color: var(--cp-admin-muted); font-size: 11px; }
+.calmpress-admin__switch { display: inline-flex !important; align-items: center; gap: 9px; margin: 0 !important; color: #475467; font-size: 13px; cursor: pointer; }
+.calmpress-admin__switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.calmpress-admin__switch span { position: relative; display: inline-block; width: 39px; height: 23px; border-radius: 99px; background: #c6ceda; transition: background .2s ease; }
+.calmpress-admin__switch span::after { position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: #fff; content: ""; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: transform .2s ease; }
+.calmpress-admin__switch input:checked + span { background: var(--cp-admin-accent); }
+.calmpress-admin__switch input:checked + span::after { transform: translateX(16px); }
+.calmpress-admin__switch input:focus-visible + span { outline: 3px solid rgba(53, 106, 230, .3); outline-offset: 2px; }
+.calmpress-admin__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+.calmpress-admin__stats > div { display: grid; gap: 8px; padding: 20px; border: 1px solid var(--cp-admin-border); border-radius: 16px; background: var(--cp-admin-surface); }
+.calmpress-admin__stats span { color: var(--cp-admin-muted); font-size: 12px; font-weight: 650; }
+.calmpress-admin__stats strong { font-size: 21px; }
+.calmpress-admin__stats b { color: var(--cp-admin-muted); font-size: 12px; font-weight: 500; }
+.calmpress-admin__stat-color { width: 30px; height: 30px; border-radius: 9px; background: var(--cp-stat-color); }
+.calmpress-admin__quick-links { display: grid; gap: 8px; min-width: min(100%, 300px); }
+.calmpress-admin__quick-links a { display: flex; justify-content: space-between; padding: 11px 13px; border: 1px solid var(--cp-admin-border); border-radius: 10px; color: #315bbd; font-size: 13px; text-decoration: none; }
+.calmpress-admin__quick-links a:hover { border-color: #a9bdea; background: #f5f8ff; }
+.calmpress-admin__notice { margin-top: 20px; padding: 13px 15px; border-left: 3px solid var(--cp-admin-accent); border-radius: 8px; color: #526174; background: #f4f7fc; font-size: 12px; line-height: 1.55; }
+.calmpress-admin__ad-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 20px; }
+.calmpress-admin__ad-card { padding: 18px; border: 1px solid var(--cp-admin-border); border-radius: 15px; background: #fbfcfe; }
+.calmpress-admin__ad-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 17px; }
+.calmpress-admin__preview-toggle { color: #315bbd; font-size: 12px; text-decoration: none; }
+.calmpress-admin__preview { max-height: 110px; overflow: auto; margin: 10px 0 0; padding: 10px; border-radius: 8px; color: #637087; background: #eef2f7; font-size: 11px; white-space: pre-wrap; }
+.calmpress-admin__steps { display: grid; gap: 17px; margin: 0; padding-left: 21px; color: #526174; line-height: 1.6; }
+.calmpress-admin__steps strong { color: var(--cp-admin-text); }
+.calmpress-admin__steps a { color: #315bbd; }
+.calmpress-admin__form { padding: 0 0 18px; }
+.calmpress-admin__form > .button { display: block; min-height: 43px; margin: 5px 0 0 auto; border-radius: 11px; }
+@media (max-width: 960px) {
+	.calmpress-admin__layout { grid-template-columns: 1fr; }
+	.calmpress-admin__sidebar { position: static; overflow-x: auto; }
+	.calmpress-admin__sidebar nav { display: flex; min-width: max-content; }
+	.calmpress-admin__sidebar a { white-space: nowrap; }
+}
+@media (max-width: 680px) {
+	.calmpress-admin { margin-right: 10px; }
+	.calmpress-admin__hero,
+	.calmpress-admin__card-head { display: block; }
+	.calmpress-admin__hero-actions { justify-content: flex-start; margin-top: 20px; }
+	.calmpress-admin__grid--2,
+	.calmpress-admin__ad-grid,
+	.calmpress-admin__stats { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.calmpress-admin * { transition-duration: .01ms !important; }
+}
+
+/* App details meta box: screenshot picker */
+.calmpress-app-screenshots__list { display: flex; flex-wrap: wrap; gap: .6rem; margin: .75rem 0; padding: 0; list-style: none; }
+.calmpress-app-screenshots__list li { position: relative; }
+.calmpress-app-screenshots__list img { display: block; width: 6rem; height: 6rem; object-fit: cover; border: 1px solid #ddd; border-radius: 6px; }
+.calmpress-app-screenshots__remove { position: absolute; top: -.4rem; right: -.4rem; width: 1.4rem; height: 1.4rem; line-height: 1; padding: 0; border: 0; border-radius: 50%; background: #d63638; color: #fff; text-align: center; cursor: pointer; }
