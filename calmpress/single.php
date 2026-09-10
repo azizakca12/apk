@@ -9,10 +9,11 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<?php while ( have_posts() ) : the_post(); ?>
 		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 			<header class="single-header">
-				<?php if ( calmpress_get_option( 'calmpress_show_metadata' ) ) : ?><div class="entry-meta"><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( get_the_author() ); ?></div><?php endif; ?>
+				<?php if ( calmpress_get_option( 'calmpress_show_metadata' ) || calmpress_get_option( 'calmpress_reading_time' ) || calmpress_get_option( 'calmpress_show_views' ) ) : ?><div class="entry-meta"><?php if ( calmpress_get_option( 'calmpress_show_metadata' ) ) : ?><span><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( get_the_author() ); ?></span><?php endif; ?><?php calmpress_render_entry_extra_meta(); ?></div><?php endif; ?>
 				<h1 class="entry-title"><?php the_title(); ?></h1>
 				<?php if ( has_excerpt() ) : ?><p class="entry-meta"><?php echo esc_html( get_the_excerpt() ); ?></p><?php endif; ?>
 			</header>

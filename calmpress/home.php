@@ -9,6 +9,7 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<header class="archive-header">
 		<h1><?php echo esc_html( calmpress_get_option( 'calmpress_blog_archive_title' ) ? calmpress_get_option( 'calmpress_blog_archive_title' ) : ( get_the_title( (int) get_option( 'page_for_posts' ) ) ?: __( 'Günlük', 'calmpress' ) ) ); ?></h1>
 		<?php $blog_description = calmpress_get_option( 'calmpress_blog_archive_description' ) ? calmpress_get_option( 'calmpress_blog_archive_description' ) : get_bloginfo( 'description' ); ?>

@@ -9,6 +9,7 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<header class="archive-header">
 		<h1><?php single_term_title(); ?></h1>
 		<?php the_archive_description( '<p>', '</p>' ); ?>

@@ -45,6 +45,15 @@ for `/apps/`, visit **Settings → Permalinks** and press **Save Changes**.
 - Focus-trapped category search modal, responsive mobile navigation, and an
   optional dismissible campaign notification stored in local storage
 - No external fonts, trackers, build step, or heavy JavaScript dependencies
+- Turkish "X dk okuma" reading-time labels, a privacy-conscious cookie-based
+  view counter, and semantic accessible breadcrumbs on singular content,
+  pages, and archives
+- Native Open Graph, Twitter Card, and PWA meta (only printed when no known
+  SEO plugin such as Yoast, Rank Math, SEOPress, or All in One SEO is
+  active), plus a dynamic `/site.webmanifest`
+- An optional `page-sitemap.php` "Site Haritası" page template, and an
+  extended app details box with a minimum Android version, changelog, and
+  up to four screenshots
 
 ## Customization
 
@@ -93,3 +102,23 @@ yükleyebilir; temanın `.po` dosyası kaynak çevirileri ve yeni yönetim panel
 ifadelerini içerir. Yönetim panelini **Görünüm → CalmPress Settings** üzerinden
 yapılandırın. Reklam kodu eklerken yalnızca güvenli HTML kullanın; JavaScript
 etiketleri bilerek kaldırılır.
+
+### Okuma süresi, görüntülenme sayacı ve izlek (breadcrumb)
+
+**Görünüm → Özelleştir → CalmPress Studio → Blog ve uygulamalar** bölümünde üç yeni denetim grubu bulunur:
+
+- **Okuma süresini göster**: içerik kelime sayısını dakikadaki kelime sayısına (varsayılan 200, 120–320 arasında ayarlanabilir) bölerek "X dk okuma" etiketini yazılarda ve kartlarda gösterir. Etiketin sonundaki metin özelleştirilebilir.
+- **Görüntülenme sayacını etkinleştir / Görüntülenme rozetini göster**: yazı ve uygulama sayfalarında, ziyaretçi başına günde bir kez artan, göz simgeli bir sayaç gösterir. Sayaç hiçbir IP adresi veya kimlik bilgisi saklamaz; yalnızca tarayıcıda küçük bir birinci taraf çerezi (`cp_viewed`) hangi yazıların zaten sayıldığını hatırlar. Oturum açmış yazarlar/yöneticiler ve bilinen tarayıcı botları sayıma dahil edilmez.
+- **İzlek (breadcrumb) gezinmesini göster**: yazı, sayfa, arşiv ve taksonomi şablonlarının üstünde erişilebilir bir `<nav aria-label>` gezinme yolu ekler; ana sayfada gösterilmez ve şema.org JSON-LD ile çakışmaması için JSON-LD üretmez.
+
+### Yerel Open Graph, Twitter Card ve PWA meta etiketleri
+
+Yoast SEO, Rank Math, SEOPress veya All in One SEO gibi bilinen bir SEO eklentisi etkin değilse CalmPress; `og:title`, `og:description`, `og:url`, `og:image`, `og:site_name`, Twitter Card, `theme-color` ve PWA meta etiketlerini otomatik olarak ekler. Standart `<link rel="canonical">` etiketi kasıtlı olarak WordPress çekirdeğinin kendi `rel_canonical()` çıktısına bırakılır; böylece iki kez yazılmaz. Aynı zamanda `/site.webmanifest` adresi, siteyi ekle simgesi, tema rengi ve site simgesinden üretilen ikonlarla anlık olarak sunulur; bunun için herhangi bir kalıcı bağlantı (permalink) ayarı veya ek dosya gerekmez.
+
+### HTML site haritası sayfa şablonu
+
+Tema, `page-sitemap.php` adlı bir sayfa şablonu içerir (Site Haritası). Bu şablon otomatik olarak hiçbir sayfaya uygulanmaz. Kullanmak için **Sayfalar → Yeni ekle** ile bir sayfa oluşturun (isterseniz slug'ı `sitemap` yapın, ya da herhangi bir slug seçip sağ taraftaki Sayfa Şablonu açılır menüsünden **Site Haritası**'nı seçin). Şablon; kategorileri, uygulama kategorilerini, uygulama arşivi bağlantısını ve sayfalanmış/sınırlandırılmış (30'ar) son yazılar listesini erişilebilir biçimde gösterir.
+
+### Genişletilmiş uygulama ayrıntıları
+
+Uygulama düzenleme ekranındaki **Uygulama ayrıntıları** kutusu artık minimum Android sürümü, sürüm notları/değişiklik günlüğü ve medya kütüphanesinden seçilen en fazla dört ekran görüntüsü alanı içerir. Ekran görüntüleri, WordPress'in yerleşik medya yükleyicisiyle eklenir; kimlik doğrulaması aynı nonce ve `edit_post` yetenek kontrolüyle korunur ve kaydedilen kimlikler yalnızca gerçek görsel eklerine göre doğrulanır. **CalmPress Studio → Blog ve uygulamalar** bölümündeki anahtarlarla galeri ve sürüm notları bölümlerinin `single-app.php` üzerinde gösterilip gösterilmeyeceği ayrı ayrı denetlenir.

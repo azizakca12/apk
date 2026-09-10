@@ -9,6 +9,7 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<header class="archive-header">
 		<h1><?php printf( esc_html__( 'Şunun için sonuçlar: %s', 'calmpress' ), '<span>' . esc_html( get_search_query() ) . '</span>' ); ?></h1>
 		<?php get_search_form(); ?>

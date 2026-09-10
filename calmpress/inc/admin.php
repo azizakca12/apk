@@ -89,6 +89,14 @@ function calmpress_get_option( $key ) {
 		'calmpress_social_x'             => '',
 		'calmpress_social_youtube'       => '',
 		'calmpress_social_github'        => '',
+		'calmpress_reading_time'         => 1,
+		'calmpress_reading_time_wpm'     => 200,
+		'calmpress_reading_time_label'   => 'dk okuma',
+		'calmpress_view_counter'         => 1,
+		'calmpress_show_views'           => 1,
+		'calmpress_breadcrumbs'          => 1,
+		'calmpress_show_app_screenshots' => 1,
+		'calmpress_show_app_changelog'   => 1,
 	);
 	if ( 0 === strpos( $key, 'calmpress_ad_' ) ) {
 		$defaults[ $key ] = false;
@@ -161,6 +169,16 @@ function calmpress_sanitize_checkbox( $value ) {
 }
 
 /**
+ * Sanitize the reading-time words-per-minute rate.
+ *
+ * @param mixed $value Submitted value.
+ * @return int
+ */
+function calmpress_sanitize_reading_wpm( $value ) {
+	return min( 320, max( 120, absint( $value ) ) );
+}
+
+/**
  * Register all public CalmPress options.
  *
  * Individual options are intentionally retained for backwards compatibility.
@@ -207,6 +225,14 @@ function calmpress_register_settings() {
 		'calmpress_campaign_enabled'    => 'calmpress_sanitize_checkbox',
 		'calmpress_campaign_text'       => 'sanitize_text_field',
 		'calmpress_campaign_link'       => 'esc_url_raw',
+		'calmpress_reading_time'        => 'calmpress_sanitize_checkbox',
+		'calmpress_reading_time_wpm'    => 'calmpress_sanitize_reading_wpm',
+		'calmpress_reading_time_label'  => 'sanitize_text_field',
+		'calmpress_view_counter'        => 'calmpress_sanitize_checkbox',
+		'calmpress_show_views'          => 'calmpress_sanitize_checkbox',
+		'calmpress_breadcrumbs'         => 'calmpress_sanitize_checkbox',
+		'calmpress_show_app_screenshots' => 'calmpress_sanitize_checkbox',
+		'calmpress_show_app_changelog'  => 'calmpress_sanitize_checkbox',
 	);
 	$placements = array( 'header', 'before_content', 'after_content', 'sidebar', 'footer' );
 	foreach ( $placements as $placement ) {
@@ -398,6 +424,7 @@ function calmpress_render_settings_page() {
 							<?php calmpress_admin_field( 'calmpress_organization_logo', 'url', 'Kuruluş logosu URL’si', 'Medya kütüphanesindeki güvenilir bir görsel URL’si.', array( 'class' => 'widefat' ) ); ?>
 						</div>
 						<?php calmpress_admin_field( 'calmpress_schema_enabled', 'checkbox', 'schema.org JSON-LD etkin', 'Yazı ve uygulama sayfalarına yapılandırılmış veri ekler.' ); ?>
+						<?php calmpress_admin_field( 'calmpress_breadcrumbs', 'checkbox', 'İzlek (breadcrumb) gezinmesini göster', 'Yazı, sayfa ve arşivlerin üstünde erişilebilir bir gezinme yolu gösterir.' ); ?>
 					</section>
 				<?php elseif ( 'performance' === $tab ) : ?>
 					<section class="calmpress-admin__card"><div class="calmpress-admin__card-head"><div><span class="calmpress-admin__kicker">Hız ve odak</span><h2>Performans</h2></div><p>Gereksiz varlıkları kapatın; değişiklikleri ölçümleyerek uygulayın.</p></div>
@@ -405,6 +432,11 @@ function calmpress_render_settings_page() {
 						<?php calmpress_admin_field( 'calmpress_disable_dashicons', 'checkbox', 'Ön yüzde Dashicons’u kapat', 'Oturum açmamış ziyaretçiler için kullanılmıyorsa kapatın.' ); ?>
 						<?php calmpress_admin_field( 'calmpress_disable_embeds', 'checkbox', 'Gömme (embed) desteğini kapat', 'WordPress embed betiğini ve keşif bağlantılarını kaldırır.' ); ?>
 						<?php calmpress_admin_field( 'calmpress_lazy_images', 'checkbox', 'Görselleri tembel yükle', 'İlk görsel hariç görsellerin tarayıcı tarafından ertelenmesini sağlar.' ); ?>
+						<?php calmpress_admin_field( 'calmpress_reading_time', 'checkbox', 'Okuma süresini göster', 'Yazılarda ve kartlarda tahmini "X dk okuma" bilgisini gösterir.' ); ?>
+						<?php calmpress_admin_field( 'calmpress_reading_time_wpm', 'number', 'Dakikadaki kelime sayısı', 'Okuma hızı tahmini için 120-320 arasında bir değer.', array( 'attrs' => 'min="120" max="320"' ) ); ?>
+						<?php calmpress_admin_field( 'calmpress_reading_time_label', 'text', 'Okuma süresi etiketi', 'Sayının sonrasında görünecek kısa Türkçe ifade.', array( 'class' => 'widefat' ) ); ?>
+						<?php calmpress_admin_field( 'calmpress_view_counter', 'checkbox', 'Görüntülenme sayacını etkinleştir', 'Ziyaretçi başına günde bir kez, çerez tabanlı ve gizlilik dostu sayım yapar.' ); ?>
+						<?php calmpress_admin_field( 'calmpress_show_views', 'checkbox', 'Görüntülenme rozetini göster', 'Sayaç etkinse göz simgeli rozeti gösterir.' ); ?>
 						<div class="calmpress-admin__notice">Not: Önbellek eklentiniz veya CDN’niz varsa değişiklik sonrası önbelleği temizleyin.</div>
 					</section>
 				<?php elseif ( 'social' === $tab ) : ?>

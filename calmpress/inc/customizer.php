@@ -134,6 +134,14 @@ function calmpress_customize_settings() {
 		'calmpress_social_x'                  => array( 'default' => '', 'sanitize' => 'esc_url_raw', 'transport' => 'refresh' ),
 		'calmpress_social_youtube'            => array( 'default' => '', 'sanitize' => 'esc_url_raw', 'transport' => 'refresh' ),
 		'calmpress_social_github'             => array( 'default' => '', 'sanitize' => 'esc_url_raw', 'transport' => 'refresh' ),
+		'calmpress_reading_time'              => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_reading_time_wpm'          => array( 'default' => 200, 'sanitize' => 'calmpress_sanitize_reading_wpm', 'transport' => 'refresh' ),
+		'calmpress_reading_time_label'        => array( 'default' => 'dk okuma', 'sanitize' => 'sanitize_text_field', 'transport' => 'refresh' ),
+		'calmpress_view_counter'              => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_show_views'                => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_breadcrumbs'               => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_show_app_screenshots'      => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
+		'calmpress_show_app_changelog'        => array( 'default' => 1, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' ),
 	);
 	foreach ( array( 'header', 'before_content', 'after_content', 'sidebar', 'footer' ) as $placement ) {
 		$settings[ 'calmpress_ad_' . $placement . '_enabled' ] = array( 'default' => 0, 'sanitize' => 'calmpress_sanitize_checkbox', 'transport' => 'refresh' );
@@ -275,6 +283,14 @@ function calmpress_customize_register( $wp_customize ) {
 	$checkbox( 'calmpress_show_metadata', 'calmpress_content', __( 'Yayın bilgilerini göster', 'calmpress' ), __( 'Yazı tarihini ve yazarını kartlarda/sayfalarda gösterir.', 'calmpress' ) );
 	$control( 'calmpress_app_download_label', 'calmpress_content', __( 'Uygulama indirme düğmesi', 'calmpress' ), __( 'Uygulama detaylarındaki düğmenin metni.', 'calmpress' ) );
 	$checkbox( 'calmpress_show_app_facts', 'calmpress_content', __( 'Uygulama bilgilerini göster', 'calmpress' ), __( 'Sürüm, platform ve geliştirici gibi bilgileri gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_show_app_screenshots', 'calmpress_content', __( 'Uygulama ekran görüntülerini göster', 'calmpress' ), __( 'Uygulama sayfasında yüklenen ekran görüntüsü galerisini gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_show_app_changelog', 'calmpress_content', __( 'Uygulama sürüm notlarını göster', 'calmpress' ), __( 'Değişiklik günlüğü girildiyse uygulama sayfasında listeler.', 'calmpress' ) );
+	$checkbox( 'calmpress_reading_time', 'calmpress_content', __( 'Okuma süresini göster', 'calmpress' ), __( 'Yazılarda ve kartlarda tahmini "X dk okuma" bilgisini gösterir.', 'calmpress' ) );
+	$control( 'calmpress_reading_time_wpm', 'calmpress_content', __( 'Dakikadaki kelime sayısı', 'calmpress' ), __( 'Okuma hızı tahmini için 120-320 arasında bir değer.', 'calmpress' ), 'number', array( 'input_attrs' => array( 'min' => 120, 'max' => 320 ) ) );
+	$control( 'calmpress_reading_time_label', 'calmpress_content', __( 'Okuma süresi etiketi', 'calmpress' ), __( 'Sayının sonrasında görünecek kısa Türkçe ifade.', 'calmpress' ) );
+	$checkbox( 'calmpress_view_counter', 'calmpress_content', __( 'Görüntülenme sayacını etkinleştir', 'calmpress' ), __( 'Ziyaretçi başına günde bir kez, çerez tabanlı ve gizlilik dostu sayım yapar.', 'calmpress' ) );
+	$checkbox( 'calmpress_show_views', 'calmpress_content', __( 'Görüntülenme rozetini göster', 'calmpress' ), __( 'Sayaç etkinse göz simgeli rozeti gösterir.', 'calmpress' ) );
+	$checkbox( 'calmpress_breadcrumbs', 'calmpress_content', __( 'İzlek (breadcrumb) gezinmesini göster', 'calmpress' ), __( 'Yazı, sayfa ve arşivlerin üstünde erişilebilir bir gezinme yolu gösterir.', 'calmpress' ) );
 
 	$control( 'calmpress_footer_text', 'calmpress_footer', __( 'Alt bilgi metni', 'calmpress' ), __( 'Telif satırının altında kısa bir marka notu.', 'calmpress' ) );
 	$checkbox( 'calmpress_show_footer_menu', 'calmpress_footer', __( 'Alt bilgi menüsünü göster', 'calmpress' ) );

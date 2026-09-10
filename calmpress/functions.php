@@ -562,6 +562,7 @@ function calmpress_render_app_meta_box( $post ) {
 		'file_size'    => array( 'label' => __( 'Dosya boyutu', 'calmpress' ), 'type' => 'text' ),
 		'platform'     => array( 'label' => __( 'Platform', 'calmpress' ), 'type' => 'text' ),
 		'developer'    => array( 'label' => __( 'Geliştirici', 'calmpress' ), 'type' => 'text' ),
+		'min_android'  => array( 'label' => __( 'Minimum Android sürümü', 'calmpress' ), 'type' => 'text' ),
 	);
 	echo '<div class="calmpress-app-fields">';
 	foreach ( $fields as $key => $field ) {
@@ -574,6 +575,36 @@ function calmpress_render_app_meta_box( $post ) {
 			esc_attr( $value )
 		);
 	}
+	echo '</div>';
+
+	$changelog = get_post_meta( $post->ID, '_calmpress_changelog', true );
+	printf(
+		'<p><label for="calmpress_changelog"><strong>%1$s</strong></label><br><textarea class="widefat" rows="5" id="calmpress_changelog" name="calmpress_changelog">%2$s</textarea><br><span class="description">%3$s</span></p>',
+		esc_html__( 'Sürüm notları / değişiklik günlüğü', 'calmpress' ),
+		esc_textarea( $changelog ),
+		esc_html__( 'Her satır ayrı bir madde olarak görüntülenir.', 'calmpress' )
+	);
+
+	$screenshot_ids = calmpress_app_screenshots( $post->ID );
+	echo '<div class="calmpress-app-screenshots">';
+	echo '<p><strong>' . esc_html__( 'Ekran görüntüleri (en fazla 4)', 'calmpress' ) . '</strong></p>';
+	echo '<ul class="calmpress-app-screenshots__list" id="calmpress-app-screenshots-list" data-max="4">';
+	foreach ( $screenshot_ids as $attachment_id ) {
+		$thumb = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+		if ( ! $thumb ) {
+			continue;
+		}
+		printf(
+			'<li data-id="%1$d"><img src="%2$s" alt=""><button type="button" class="button-link calmpress-app-screenshots__remove" aria-label="%3$s">&times;</button></li>',
+			absint( $attachment_id ),
+			esc_url( $thumb[0] ),
+			esc_attr__( 'Kaldır', 'calmpress' )
+		);
+	}
+	echo '</ul>';
+	printf( '<input type="hidden" id="calmpress_screenshots" name="calmpress_screenshots" value="%s">', esc_attr( implode( ',', $screenshot_ids ) ) );
+	echo '<p><button type="button" class="button" id="calmpress-app-screenshots-button">' . esc_html__( 'Ekran görüntüsü ekle', 'calmpress' ) . '</button></p>';
+	echo '<p class="description">' . esc_html__( 'Medya kütüphanesinden en fazla dört görsel seçin.', 'calmpress' ) . '</p>';
 	echo '</div>';
 }
 
@@ -600,6 +631,8 @@ function calmpress_save_app_details( $post_id ) {
 		'file_size'    => 'sanitize_text_field',
 		'platform'     => 'sanitize_text_field',
 		'developer'    => 'sanitize_text_field',
+		'min_android'  => 'sanitize_text_field',
+		'changelog'    => 'sanitize_textarea_field',
 	);
 	foreach ( $fields as $key => $sanitizer ) {
 		$field_name = 'calmpress_' . $key;
@@ -613,6 +646,20 @@ function calmpress_save_app_details( $post_id ) {
 			update_post_meta( $post_id, '_calmpress_' . $key, $value );
 		}
 	}
+
+	if ( isset( $_POST['calmpress_screenshots'] ) ) {
+		$ids = array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_POST['calmpress_screenshots'] ) ) ) ) );
+		$ids = array_values( array_unique( $ids ) );
+		$ids = array_values( array_filter( $ids, static function ( $attachment_id ) {
+			return 'attachment' === get_post_type( $attachment_id );
+		} ) );
+		$ids = array_slice( $ids, 0, 4 );
+		if ( empty( $ids ) ) {
+			delete_post_meta( $post_id, '_calmpress_screenshots' );
+		} else {
+			update_post_meta( $post_id, '_calmpress_screenshots', implode( ',', $ids ) );
+		}
+	}
 }
 add_action( 'save_post_app', 'calmpress_save_app_details' );
 
@@ -624,7 +671,7 @@ add_action( 'save_post_app', 'calmpress_save_app_details' );
  * @return string
  */
 function calmpress_app_detail( $post_id, $key ) {
-	$allowed = array( 'download_url', 'version', 'file_size', 'platform', 'developer' );
+	$allowed = array( 'download_url', 'version', 'file_size', 'platform', 'developer', 'min_android', 'changelog' );
 	if ( ! in_array( $key, $allowed, true ) ) {
 		return '';
 	}
@@ -1031,3 +1078,479 @@ class CalmPress_Categories_Widget extends WP_Widget {
 		return array( 'title' => sanitize_text_field( $new_instance['title'] ?? '' ) );
 	}
 }
+/**
+ * Return the estimated reading time in whole minutes for a post.
+ *
+ * Uses a simple word-count heuristic (content words divided by a configured
+ * words-per-minute rate). Splitting on whitespace works well for Turkish
+ * since it does not depend on locale-specific word boundary rules.
+ *
+ * @param int|WP_Post|null $post Post ID or object. Defaults to the current post.
+ * @return int
+ */
+function calmpress_reading_time_minutes( $post = null ) {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return 0;
+	}
+	$text  = wp_strip_all_tags( strip_shortcodes( $post->post_content ) );
+	$words = preg_split( '/\s+/u', trim( $text ), -1, PREG_SPLIT_NO_EMPTY );
+	$count = is_array( $words ) ? count( $words ) : 0;
+	if ( 0 === $count ) {
+		return 0;
+	}
+	$wpm = min( 320, max( 120, absint( calmpress_get_option( 'calmpress_reading_time_wpm' ) ) ) );
+	return max( 1, (int) ceil( $count / $wpm ) );
+}
+
+/**
+ * Build the localized "X dk okuma" reading-time label.
+ *
+ * @param int|WP_Post|null $post Post ID or object.
+ * @return string Empty string when the feature is disabled or there is no content.
+ */
+function calmpress_reading_time_label( $post = null ) {
+	if ( ! calmpress_get_option( 'calmpress_reading_time' ) ) {
+		return '';
+	}
+	$minutes = calmpress_reading_time_minutes( $post );
+	if ( $minutes < 1 ) {
+		return '';
+	}
+	$suffix = trim( (string) calmpress_get_option( 'calmpress_reading_time_label' ) );
+	if ( '' === $suffix ) {
+		$suffix = __( 'dk okuma', 'calmpress' );
+	}
+	return $minutes . ' ' . $suffix;
+}
+
+/**
+ * Return the post types the lightweight view counter tracks and displays.
+ *
+ * @return string[]
+ */
+function calmpress_view_counter_post_types() {
+	$types = apply_filters( 'calmpress_view_counter_post_types', array( 'post', 'app' ) );
+	return array_values( array_filter( array_map( 'sanitize_key', (array) $types ) ) );
+}
+
+/**
+ * Return the stored, sanitized view count for a post.
+ *
+ * @param int|null $post_id Post ID. Defaults to the current post in the loop.
+ * @return int
+ */
+function calmpress_get_view_count( $post_id = null ) {
+	$post_id = $post_id ? absint( $post_id ) : absint( get_the_ID() );
+	if ( ! $post_id ) {
+		return 0;
+	}
+	return absint( get_post_meta( $post_id, '_calmpress_views', true ) );
+}
+
+/**
+ * A dependency-free, best-effort check for common crawler user agents.
+ *
+ * This intentionally avoids third-party bot-detection services; it only
+ * skips counting a handful of well-known non-human clients.
+ *
+ * @return bool
+ */
+function calmpress_is_probable_bot() {
+	$agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+	if ( '' === $agent ) {
+		return true;
+	}
+	return (bool) preg_match( '/bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegrambot|pingdom|uptimerobot|ahrefs|semrush|mj12bot|lighthouse|headless|bingpreview/i', $agent );
+}
+
+/**
+ * Increment a post's view counter at most once per visitor per day.
+ *
+ * No IP addresses or other identifying data are stored; a single, small
+ * first-party cookie remembers which posts a browser already counted so a
+ * refresh or repeat visit within the window does not inflate the number.
+ * Logged-in users who can edit posts, feeds, previews, and likely bots are
+ * excluded so editorial traffic never pollutes the count.
+ *
+ * @return void
+ */
+function calmpress_track_view() {
+	if ( is_admin() || ! calmpress_get_option( 'calmpress_view_counter' ) ) {
+		return;
+	}
+	$post_types = calmpress_view_counter_post_types();
+	if ( empty( $post_types ) || ! is_singular( $post_types ) || is_preview() || is_feed() ) {
+		return;
+	}
+	if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
+		return;
+	}
+	if ( calmpress_is_probable_bot() || headers_sent() ) {
+		return;
+	}
+	$post_id = get_queried_object_id();
+	if ( ! $post_id ) {
+		return;
+	}
+	$viewed = array();
+	if ( isset( $_COOKIE['cp_viewed'] ) ) {
+		$viewed = array_filter( array_map( 'absint', explode( ',', sanitize_text_field( wp_unslash( $_COOKIE['cp_viewed'] ) ) ) ) );
+	}
+	if ( in_array( $post_id, $viewed, true ) ) {
+		return;
+	}
+	update_post_meta( $post_id, '_calmpress_views', calmpress_get_view_count( $post_id ) + 1 );
+	$viewed[] = $post_id;
+	if ( count( $viewed ) > 200 ) {
+		$viewed = array_slice( $viewed, -200 );
+	}
+	$cookie_path   = ( defined( 'COOKIEPATH' ) && COOKIEPATH ) ? COOKIEPATH : '/';
+	$cookie_domain = defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '';
+	setcookie( 'cp_viewed', implode( ',', $viewed ), time() + DAY_IN_SECONDS, $cookie_path, $cookie_domain, is_ssl(), true );
+}
+add_action( 'template_redirect', 'calmpress_track_view' );
+
+/**
+ * Render an accessible, muted view-count badge with an eye icon.
+ *
+ * @param int|null $post_id Post ID. Defaults to the current post.
+ * @return void
+ */
+function calmpress_render_view_count( $post_id = null ) {
+	if ( ! calmpress_get_option( 'calmpress_show_views' ) ) {
+		return;
+	}
+	$post_id = $post_id ? absint( $post_id ) : absint( get_the_ID() );
+	if ( ! $post_id || ! in_array( get_post_type( $post_id ), calmpress_view_counter_post_types(), true ) ) {
+		return;
+	}
+	$count = calmpress_get_view_count( $post_id );
+	printf(
+		'<span class="view-count"><svg class="view-count__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 5C5 5 2 12 2 12s3 7 10 7 10-7 10-7-3-7-10-7Zm0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm0-2.2a1.8 1.8 0 1 0 0-3.6 1.8 1.8 0 0 0 0 3.6Z"/></svg><span class="screen-reader-text">%1\$s</span><span aria-hidden="true">%2\$s</span></span>',
+		esc_html( sprintf( _n( '%s görüntülenme', '%s görüntülenme', $count, 'calmpress' ), number_format_i18n( $count ) ) ),
+		esc_html( number_format_i18n( $count ) )
+	);
+}
+
+/**
+ * Render the reading-time label and view-count badge together.
+ *
+ * Reading time only applies to standard posts; the view badge honors the
+ * configured, filterable post types.
+ *
+ * @param int|null $post_id Post ID. Defaults to the current post.
+ * @return void
+ */
+function calmpress_render_entry_extra_meta( $post_id = null ) {
+	$post_id = $post_id ? absint( $post_id ) : absint( get_the_ID() );
+	if ( ! $post_id ) {
+		return;
+	}
+	$reading = 'post' === get_post_type( $post_id ) ? calmpress_reading_time_label( $post_id ) : '';
+	ob_start();
+	if ( $reading ) {
+		printf( '<span class="reading-time"><span aria-hidden="true">⏱</span>%s</span>', esc_html( $reading ) );
+	}
+	calmpress_render_view_count( $post_id );
+	$markup = ob_get_clean();
+	if ( '' === $markup ) {
+		return;
+	}
+	echo '<span class="entry-meta__extra">' . $markup . '</span>';
+}
+
+/**
+ * Return the list of allowed screenshot attachment IDs for an app.
+ *
+ * @param int $post_id App post ID.
+ * @return int[]
+ */
+function calmpress_app_screenshots( $post_id ) {
+	$raw = get_post_meta( absint( $post_id ), '_calmpress_screenshots', true );
+	if ( '' === trim( (string) $raw ) ) {
+		return array();
+	}
+	$ids = array_filter( array_map( 'absint', explode( ',', (string) $raw ) ) );
+	$ids = array_values( array_unique( $ids ) );
+	$ids = array_filter( $ids, static function ( $attachment_id ) {
+		return 'attachment' === get_post_type( $attachment_id );
+	} );
+	return array_slice( array_values( $ids ), 0, 4 );
+}
+
+/**
+ * Enqueue the media uploader and screenshot picker script on the app editor.
+ *
+ * @param string $hook_suffix Current admin screen hook.
+ * @return void
+ */
+function calmpress_app_admin_assets( $hook_suffix ) {
+	if ( ! in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) ) {
+		return;
+	}
+	$screen = get_current_screen();
+	if ( ! $screen || 'app' !== $screen->post_type ) {
+		return;
+	}
+	wp_enqueue_media();
+	$style = get_template_directory() . '/assets/css/admin.css';
+	wp_enqueue_style( 'calmpress-admin', get_template_directory_uri() . '/assets/css/admin.css', array(), file_exists( $style ) ? (string) filemtime( $style ) : CALMPRESS_VERSION );
+	$script = get_template_directory() . '/assets/js/app-admin.js';
+	wp_enqueue_script( 'calmpress-app-admin', get_template_directory_uri() . '/assets/js/app-admin.js', array(), file_exists( $script ) ? (string) filemtime( $script ) : CALMPRESS_VERSION, true );
+	wp_localize_script(
+		'calmpress-app-admin',
+		'calmpressAppAdmin',
+		array(
+			'title'        => __( 'Ekran görüntüsü seç', 'calmpress' ),
+			'buttonText'   => __( 'Kullan', 'calmpress' ),
+			'removeLabel'  => __( 'Kaldır', 'calmpress' ),
+			'limitReached' => __( 'En fazla dört ekran görüntüsü ekleyebilirsiniz.', 'calmpress' ),
+		)
+	);
+}
+add_action( 'admin_enqueue_scripts', 'calmpress_app_admin_assets' );
+
+/**
+ * Render a semantic, accessible breadcrumb trail.
+ *
+ * Skipped on the front page since it has no ancestors. Intentionally plain
+ * HTML with no JSON-LD so it never conflicts with the schema.org markup
+ * already printed for singular content.
+ *
+ * @return void
+ */
+function calmpress_render_breadcrumbs() {
+	if ( is_front_page() || ! calmpress_get_option( 'calmpress_breadcrumbs' ) ) {
+		return;
+	}
+	$items   = array();
+	$items[] = array(
+		'label' => __( 'Anasayfa', 'calmpress' ),
+		'url'   => home_url( '/' ),
+	);
+
+	if ( is_singular( 'app' ) ) {
+		$archive_link = get_post_type_archive_link( 'app' );
+		if ( $archive_link ) {
+			$items[] = array( 'label' => __( 'Uygulamalar', 'calmpress' ), 'url' => $archive_link );
+		}
+		$terms = get_the_terms( get_the_ID(), 'app_category' );
+		if ( $terms && ! is_wp_error( $terms ) ) {
+			$term    = reset( $terms );
+			$items[] = array( 'label' => $term->name, 'url' => get_term_link( $term ) );
+		}
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_singular( 'post' ) ) {
+		$blog_page_id = (int) get_option( 'page_for_posts' );
+		if ( $blog_page_id ) {
+			$items[] = array( 'label' => get_the_title( $blog_page_id ), 'url' => get_permalink( $blog_page_id ) );
+		}
+		$categories = get_the_category();
+		if ( $categories ) {
+			$items[] = array( 'label' => $categories[0]->name, 'url' => get_category_link( $categories[0] ) );
+		}
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_page() ) {
+		$ancestors = array_reverse( get_post_ancestors( get_the_ID() ) );
+		foreach ( $ancestors as $ancestor_id ) {
+			$items[] = array( 'label' => get_the_title( $ancestor_id ), 'url' => get_permalink( $ancestor_id ) );
+		}
+		$items[] = array( 'label' => get_the_title(), 'url' => '' );
+	} elseif ( is_post_type_archive( 'app' ) ) {
+		$items[] = array( 'label' => post_type_archive_title( '', false ), 'url' => '' );
+	} elseif ( is_tax( 'app_category' ) ) {
+		$archive_link = get_post_type_archive_link( 'app' );
+		if ( $archive_link ) {
+			$items[] = array( 'label' => __( 'Uygulamalar', 'calmpress' ), 'url' => $archive_link );
+		}
+		$items[] = array( 'label' => single_term_title( '', false ), 'url' => '' );
+	} elseif ( is_category() || is_tag() ) {
+		$items[] = array( 'label' => single_term_title( '', false ), 'url' => '' );
+	} elseif ( is_author() ) {
+		$items[] = array( 'label' => sprintf( __( 'Yazar: %s', 'calmpress' ), get_the_author() ), 'url' => '' );
+	} elseif ( is_date() ) {
+		$items[] = array( 'label' => __( 'Tarihe göre arşiv', 'calmpress' ), 'url' => '' );
+	} elseif ( is_search() ) {
+		$items[] = array( 'label' => sprintf( __( 'Arama sonuçları: %s', 'calmpress' ), get_search_query() ), 'url' => '' );
+	} elseif ( is_home() ) {
+		$items[] = array( 'label' => __( 'Günlük', 'calmpress' ), 'url' => '' );
+	} else {
+		return;
+	}
+
+	if ( count( $items ) < 2 ) {
+		return;
+	}
+
+	echo '<nav class="breadcrumbs" aria-label="' . esc_attr__( 'İzlek', 'calmpress' ) . '"><ol>';
+	$last = count( $items ) - 1;
+	foreach ( $items as $index => $item ) {
+		if ( $index === $last || '' === $item['url'] ) {
+			printf( '<li aria-current="page">%s</li>', esc_html( $item['label'] ) );
+		} else {
+			printf( '<li><a href="%s">%s</a></li>', esc_url( $item['url'] ), esc_html( $item['label'] ) );
+		}
+	}
+	echo '</ol></nav>';
+}
+
+/**
+ * Detect a handful of common SEO plugins so CalmPress never prints
+ * duplicate Open Graph, Twitter Card, or PWA meta tags alongside them.
+ *
+ * @return bool
+ */
+function calmpress_seo_plugin_active() {
+	return defined( 'WPSEO_VERSION' )
+		|| class_exists( 'WPSEO_Frontend' )
+		|| defined( 'RANK_MATH_VERSION' )
+		|| class_exists( 'RankMath' )
+		|| defined( 'SEOPRESS_VERSION' )
+		|| function_exists( 'seopress_init' )
+		|| defined( 'AIOSEO_VERSION' )
+		|| class_exists( 'All_in_One_SEO_Pack' );
+}
+
+/**
+ * Print native Open Graph, Twitter Card, and PWA meta tags.
+ *
+ * Only runs when no known SEO plugin is active, so CalmPress never produces
+ * duplicate tags. The document `<link rel="canonical">` is intentionally
+ * left to WordPress core's own `rel_canonical()`, which already prints it;
+ * this only adds `og:url`, which mirrors it for social crawlers.
+ *
+ * @return void
+ */
+function calmpress_social_meta() {
+	if ( is_admin() || is_feed() || calmpress_seo_plugin_active() ) {
+		return;
+	}
+
+	$title       = '';
+	$description = '';
+	$url         = '';
+	$type        = 'website';
+	$image       = '';
+
+	if ( is_singular() ) {
+		$url   = (string) get_permalink();
+		$title = wp_strip_all_tags( get_the_title() );
+		$type  = 'app' === get_post_type() ? 'website' : 'article';
+		if ( has_excerpt() ) {
+			$description = get_the_excerpt();
+		} else {
+			$description = wp_trim_words( wp_strip_all_tags( get_the_content() ), 45, '…' );
+		}
+		if ( has_post_thumbnail() ) {
+			$image = (string) get_the_post_thumbnail_url( get_the_ID(), 'large' );
+		}
+	} elseif ( is_category() || is_tag() || is_tax() ) {
+		$term        = get_queried_object();
+		$url         = (string) get_term_link( $term );
+		$title       = single_term_title( '', false );
+		$description = wp_strip_all_tags( term_description() );
+	} elseif ( is_author() ) {
+		$url   = (string) get_author_posts_url( get_queried_object_id() );
+		$title = get_the_author();
+	} elseif ( is_home() || is_front_page() ) {
+		$url         = home_url( '/' );
+		$title       = get_bloginfo( 'name' );
+		$description = get_bloginfo( 'description' );
+	} else {
+		global $wp;
+		$url   = home_url( add_query_arg( array(), $wp->request ) );
+		$title = wp_strip_all_tags( wp_get_document_title() );
+	}
+
+	if ( '' === trim( (string) $description ) ) {
+		$description = calmpress_get_option( 'calmpress_seo_description' );
+	}
+	$description = wp_strip_all_tags( (string) $description );
+	if ( '' === $image ) {
+		$custom_logo_id = get_theme_mod( 'custom_logo' );
+		if ( $custom_logo_id ) {
+			$logo_src = wp_get_attachment_image_src( $custom_logo_id, 'large' );
+			if ( $logo_src ) {
+				$image = $logo_src[0];
+			}
+		}
+	}
+
+	printf( '<meta property="og:type" content="%s">' . "\n", esc_attr( $type ) );
+	if ( $title ) {
+		printf( '<meta property="og:title" content="%s">' . "\n", esc_attr( $title ) );
+		printf( '<meta name="twitter:title" content="%s">' . "\n", esc_attr( $title ) );
+	}
+	if ( $description ) {
+		$trimmed = wp_trim_words( $description, 55, '…' );
+		printf( '<meta property="og:description" content="%s">' . "\n", esc_attr( $trimmed ) );
+		printf( '<meta name="twitter:description" content="%s">' . "\n", esc_attr( $trimmed ) );
+	}
+	if ( $url ) {
+		printf( '<meta property="og:url" content="%s">' . "\n", esc_url( $url ) );
+	}
+	printf( '<meta property="og:site_name" content="%s">' . "\n", esc_attr( get_bloginfo( 'name' ) ) );
+	printf( '<meta name="twitter:card" content="%s">' . "\n", esc_attr( $image ? 'summary_large_image' : 'summary' ) );
+	if ( $image ) {
+		printf( '<meta property="og:image" content="%s">' . "\n", esc_url( $image ) );
+		printf( '<meta name="twitter:image" content="%s">' . "\n", esc_url( $image ) );
+	}
+	$accent = calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_color' ) );
+	printf( '<meta name="theme-color" content="%s">' . "\n", esc_attr( $accent ) );
+	echo '<meta name="mobile-web-app-capable" content="yes">' . "\n";
+	echo '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";
+	echo '<meta name="apple-mobile-web-app-status-bar-style" content="default">' . "\n";
+	printf( '<meta name="apple-mobile-web-app-title" content="%s">' . "\n", esc_attr( get_bloginfo( 'name' ) ) );
+	echo '<link rel="manifest" href="' . esc_url( home_url( '/site.webmanifest' ) ) . '">' . "\n";
+}
+add_action( 'wp_head', 'calmpress_social_meta', 3 );
+
+/**
+ * Serve a small, dynamic web app manifest without adding rewrite rules.
+ *
+ * Intercepts `/site.webmanifest` (and the equally common `/manifest.json`)
+ * at `template_redirect`, before WordPress renders its 404 template, so no
+ * permalink flush is required after activation.
+ *
+ * @return void
+ */
+function calmpress_serve_manifest() {
+	if ( is_admin() || calmpress_seo_plugin_active() ) {
+		return;
+	}
+	$request_path = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+	$request_path = rtrim( $request_path, '/' );
+	if ( ! in_array( $request_path, array( '/site.webmanifest', '/manifest.json' ), true ) ) {
+		return;
+	}
+	$icons        = array();
+	$site_icon_id = get_option( 'site_icon' );
+	if ( $site_icon_id ) {
+		foreach ( array( 192, 512 ) as $size ) {
+			$src = wp_get_attachment_image_src( (int) $site_icon_id, array( $size, $size ) );
+			if ( $src ) {
+				$icons[] = array(
+					'src'   => $src[0],
+					'sizes' => $size . 'x' . $size,
+					'type'  => get_post_mime_type( (int) $site_icon_id ) ?: 'image/png',
+				);
+			}
+		}
+	}
+	$manifest = array(
+		'name'             => get_bloginfo( 'name' ),
+		'short_name'       => wp_trim_words( get_bloginfo( 'name' ), 2, '' ),
+		'description'      => wp_strip_all_tags( get_bloginfo( 'description' ) ),
+		'start_url'        => home_url( '/' ),
+		'display'          => 'standalone',
+		'background_color' => '#ffffff',
+		'theme_color'      => calmpress_sanitize_accent_color( calmpress_get_option( 'calmpress_accent_color' ) ),
+		'icons'            => $icons,
+	);
+	header( 'Content-Type: application/manifest+json; charset=utf-8' );
+	status_header( 200 );
+	echo wp_json_encode( $manifest, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+	exit;
+}
+add_action( 'template_redirect', 'calmpress_serve_manifest', 0 );

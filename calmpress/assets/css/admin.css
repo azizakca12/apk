@@ -119,3 +119,9 @@
 @media (prefers-reduced-motion: reduce) {
 	.calmpress-admin * { transition-duration: .01ms !important; }
 }
+
+/* App details meta box: screenshot picker */
+.calmpress-app-screenshots__list { display: flex; flex-wrap: wrap; gap: .6rem; margin: .75rem 0; padding: 0; list-style: none; }
+.calmpress-app-screenshots__list li { position: relative; }
+.calmpress-app-screenshots__list img { display: block; width: 6rem; height: 6rem; object-fit: cover; border: 1px solid #ddd; border-radius: 6px; }
+.calmpress-app-screenshots__remove { position: absolute; top: -.4rem; right: -.4rem; width: 1.4rem; height: 1.4rem; line-height: 1; padding: 0; border: 0; border-radius: 50%; background: #d63638; color: #fff; text-align: center; cursor: pointer; }

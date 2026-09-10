@@ -9,6 +9,7 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<header class="archive-header">
 		<?php $archive_title = is_home() && calmpress_get_option( 'calmpress_blog_archive_title' ) ? calmpress_get_option( 'calmpress_blog_archive_title' ) : ''; ?>
 		<?php $archive_description = is_home() && calmpress_get_option( 'calmpress_blog_archive_description' ) ? calmpress_get_option( 'calmpress_blog_archive_description' ) : ''; ?>

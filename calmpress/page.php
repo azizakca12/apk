@@ -9,6 +9,7 @@ get_header();
 ?>
 <main id="primary" class="site-main">
 	<?php calmpress_render_before_content(); ?>
+	<?php calmpress_render_breadcrumbs(); ?>
 	<?php while ( have_posts() ) : the_post(); ?>
 		<article id="post-<?php the_ID(); ?>" <?php post_class( 'content-card' ); ?>>
 			<header><h1 class="entry-title"><?php the_title(); ?></h1></header>
