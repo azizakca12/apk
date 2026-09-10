@@ -156,6 +156,25 @@ button:active,
 	box-shadow: var(--cp-shadow);
 }
 
+.reading-progress {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 60;
+	height: 3px;
+	background: transparent;
+	pointer-events: none;
+}
+.reading-progress__bar {
+	display: block;
+	height: 100%;
+	width: 0;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--cp-accent), color-mix(in srgb, var(--cp-accent) 55%, #7dd3fc));
+	box-shadow: 0 0 18px color-mix(in srgb, var(--cp-accent) 50%, transparent);
+}
+
 .site-header {
 	z-index: 20;
 	top: 0;
@@ -384,6 +403,29 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 
 .single-header { max-width: 52rem; margin: 0 auto 2rem; }
 .single-header .entry-title { font-size: clamp(2.2rem, 5vw, 4rem); }
+.single-header__meta-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .6rem;
+	margin-top: 1rem;
+}
+.feature-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: .38rem .75rem;
+	border: 1px solid var(--cp-border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--cp-surface-muted) 80%, transparent);
+	color: var(--cp-text-muted);
+	font-size: .8rem;
+	font-weight: 650;
+	letter-spacing: .01em;
+}
+.feature-chip--accent {
+	background: color-mix(in srgb, var(--cp-accent) 11%, var(--cp-surface-muted));
+	border-color: color-mix(in srgb, var(--cp-accent) 32%, var(--cp-border));
+	color: var(--cp-accent);
+}
 .featured-image { margin: 1.5rem auto 2rem; border-radius: var(--cp-radius); }
 .post-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--cp-border); }
 .post-navigation a { display: inline-flex; color: var(--cp-text); font-weight: 650; text-decoration: none; }

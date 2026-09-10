@@ -16,6 +16,14 @@ get_header();
 				<?php if ( calmpress_get_option( 'calmpress_show_metadata' ) || calmpress_get_option( 'calmpress_reading_time' ) || calmpress_get_option( 'calmpress_show_views' ) ) : ?><div class="entry-meta"><?php if ( calmpress_get_option( 'calmpress_show_metadata' ) ) : ?><span><?php echo esc_html( get_the_date() ); ?> · <?php echo esc_html( get_the_author() ); ?></span><?php endif; ?><?php calmpress_render_entry_extra_meta(); ?></div><?php endif; ?>
 				<h1 class="entry-title"><?php the_title(); ?></h1>
 				<?php if ( has_excerpt() ) : ?><p class="entry-meta"><?php echo esc_html( get_the_excerpt() ); ?></p><?php endif; ?>
+				<div class="single-header__meta-strip" aria-label="<?php esc_attr_e( 'Yazı bilgileri', 'calmpress' ); ?>">
+					<span class="feature-chip"><?php echo esc_html( get_the_date( 'd M Y' ) ); ?></span>
+					<span class="feature-chip"><?php echo esc_html( get_the_author() ); ?></span>
+					<?php if ( calmpress_get_option( 'calmpress_reading_time' ) ) : ?>
+						<?php $reading_label = calmpress_reading_time_label(); if ( $reading_label ) : ?><span class="feature-chip feature-chip--accent"><?php echo esc_html( $reading_label ); ?></span><?php endif; ?>
+					<?php endif; ?>
+					<?php $categories = get_the_category_list( ' · ' ); if ( $categories ) : ?><span class="feature-chip"><?php echo wp_kses_post( $categories ); ?></span><?php endif; ?>
+				</div>
 			</header>
 			<?php if ( has_post_thumbnail() ) : the_post_thumbnail( 'large', array( 'class' => 'featured-image', 'loading' => 'eager', 'fetchpriority' => 'high' ) ); endif; ?>
 			<div class="content-card">

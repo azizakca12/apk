@@ -13,6 +13,7 @@
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<div class="reading-progress" aria-hidden="true"><span class="reading-progress__bar"></span></div>
 <a class="screen-reader-text" href="#primary"><?php esc_html_e( 'İçeriğe geç', 'calmpress' ); ?></a>
 <?php $announcement_style = function_exists( 'calmpress_customize_announcement_style' ) ? calmpress_customize_announcement_style( calmpress_get_option( 'calmpress_announcement_style' ) ) : 'soft'; ?>
 <?php $nav_style = function_exists( 'calmpress_customize_nav_style' ) ? calmpress_customize_nav_style( calmpress_get_option( 'calmpress_primary_nav_style' ) ) : 'minimal'; ?>

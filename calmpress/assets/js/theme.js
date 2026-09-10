@@ -49,6 +49,20 @@
 		updateButton();
 	}
 
+	var progress = document.querySelector('.reading-progress');
+	var progressBar = progress ? progress.querySelector('.reading-progress__bar') : null;
+	var updateReadingProgress = function () {
+		if (!progress || !progressBar) {
+			return;
+		}
+		var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+		var ratio = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+		progressBar.style.width = Math.min(100, Math.max(0, ratio)) + '%';
+	};
+	window.addEventListener('scroll', updateReadingProgress, { passive: true });
+	window.addEventListener('resize', updateReadingProgress, { passive: true });
+	updateReadingProgress();
+
 	var backToTop = document.querySelector('[data-back-to-top]');
 	if (backToTop) {
 		var toggleBackToTop = function () {
